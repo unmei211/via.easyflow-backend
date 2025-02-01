@@ -1,0 +1,41 @@
+services:
+  easyflow-blue:
+    env_file:
+      - env.yml
+    ports:
+      - "8090:8090"
+    pull_policy: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    depends_on:
+      - database
+    profiles:
+      - deploy
+  database: &database
+    image: 'postgres:latest'
+    container_name: database
+    env_file:
+      - env.yml
+    networks:
+      - app-network
+    ports:
+      - "5443:5432"
+    profiles:
+      - deploy
+  local-database:
+    << : *database
+    container_name: local-database
+    env_file:
+      - env.local.yml
+    ports:
+      - "5443:5432"
+    profiles:
+      - local
+volumes:
+  pgdata:
+
+networks:
+  app-network:

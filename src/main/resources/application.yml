@@ -1,0 +1,36 @@
+# Modules
+
+# Logging
+logging:
+  file:
+    path: ./logs
+  level:
+    via:
+      easyflow: DEBUG
+    org:
+      springframework: DEBUG
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+# App
+spring:
+  docker:
+    compose:
+      profiles:
+        active: ${PROFILE}
+  profiles:
+    active: ${PROFILE}
+  application:
+    name: easyflow
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
