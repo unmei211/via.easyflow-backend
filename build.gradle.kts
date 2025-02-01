@@ -23,8 +23,9 @@ extra["springModulithVersion"] = "1.1.9"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+//    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+//    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -32,7 +33,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.modulith:spring-modulith-events-api")
     implementation("org.springframework.modulith:spring-modulith-starter-core")
-    implementation("org.springframework.modulith:spring-modulith-starter-jdbc")
+//    implementation("org.springframework.modulith:spring-modulith-starter-jdbc")
     implementation("io.swagger.core.v3:swagger-annotations:2.1.11")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")

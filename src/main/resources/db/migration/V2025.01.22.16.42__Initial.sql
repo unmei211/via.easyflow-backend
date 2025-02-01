@@ -2,5 +2,5 @@
 -- (
 --     document jsonb
 -- );
---
--- CREATE UNIQUE INDEX ON property ((document ->> 'propertyId'));
+-- --
+-- -- CREATE UNIQUE INDEX ON property ((document ->> 'propertyId'));
