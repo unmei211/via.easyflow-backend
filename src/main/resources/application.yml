@@ -19,7 +19,20 @@ management:
       exposure:
         include: health,info
 
+datasource:
+  host: &postgres_host ${POSTGRES_HOST}
+  port: &postgres_port ${POSTGRES_PORT}
+  name: &postgres_db ${POSTGRES_DB}
+  user: &postgres_user ${POSTGRES_USER}
+  password: &postgres_password ${POSTGRES_PASSWORD}
+  driver: &postgresql postgresql
+
 # App
+
+server:
+  servlet:
+    context-path: /api
+  port: 8090
 spring:
   docker:
     compose:
@@ -31,6 +44,6 @@ spring:
     name: easyflow
   datasource:
     driver-class-name: org.postgresql.Driver
-    password: ${POSTGRES_PASSWORD}
-    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-    username: ${POSTGRES_USER}
+    password: *postgres_password
+    username: *postgres_user
+    url: jdbc:postgresql://${datasource.host}:${datasource.port}/${datasource.name}
