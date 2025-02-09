@@ -22,7 +22,8 @@ class DatasourceConnectionConfiguration(
             .option(USER, props.user)
             .option(PORT, props.port)
             .option(PASSWORD, props.password)
-            .option(DATABASE, props.name).build()
+            .option(DATABASE, props.name)
+            .build()
     )
 
     @Bean

@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.2.10"
+    kotlin("plugin.spring") version "2.1.10"
+    id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 }
@@ -41,6 +41,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
     implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.github.resilience4j:resilience4j-ratelimiter:2.2.0")
     implementation("jakarta.validation:jakarta.validation-api")

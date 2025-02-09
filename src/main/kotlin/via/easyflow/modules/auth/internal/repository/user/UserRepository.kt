@@ -13,8 +13,8 @@ class UserRepository(
     override fun upsert(user: UserModelDto): Mono<Void> {
         client.sql("SELECT * FROM users WHERE (document ->> 'id' = '${user.id}')")
             .fetch()
-            .one()
-            .map { row -> row["documtn"]}
+            .all()
+            .map { row -> row["documtn"] }
         TODO("Not yet implemented")
     }
 

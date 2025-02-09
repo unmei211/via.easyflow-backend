@@ -1,6 +1,0 @@
--- CREATE TABLE IF NOT EXISTS property
--- (
---     document jsonb
--- );
---
--- CREATE UNIQUE INDEX ON property ((document ->> 'propertyId'));

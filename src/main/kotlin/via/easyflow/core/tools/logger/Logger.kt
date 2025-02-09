@@ -1,4 +1,4 @@
-package via.easyflow.core.logger
+package via.easyflow.core.tools.logger
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

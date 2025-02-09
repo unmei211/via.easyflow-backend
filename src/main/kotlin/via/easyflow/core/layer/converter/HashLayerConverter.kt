@@ -2,7 +2,7 @@ package via.easyflow.core.layer.converter
 
 import via.easyflow.core.layer.exception.ConvertException
 import via.easyflow.core.layer.converter.function.TypedConverterFunction
-import via.easyflow.core.logger.logger
+import via.easyflow.core.tools.logger.logger
 import kotlin.collections.HashMap
 import kotlin.reflect.KClass
 
@@ -32,6 +32,9 @@ class HashLayerConverter<L1, L2>(
             throw ConvertException(e.message, e.cause)
         }
     }
+
+    override fun <T : Any, R : Any> convert(fromTo: Pair<T, KClass<R>>): R =
+        this.convert(fromTo.first, fromTo.second)
 
     inline fun <T : Any, reified R : Any> convert(from: T): R = convert(from, R::class)
 }

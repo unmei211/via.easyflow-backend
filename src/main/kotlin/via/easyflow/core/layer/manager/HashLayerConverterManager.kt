@@ -4,7 +4,7 @@ import via.easyflow.core.layer.converter.HashLayerConverter
 import via.easyflow.core.layer.converter.ILayerConverter
 import via.easyflow.core.layer.converter.function.TypedConverterFunction
 import via.easyflow.core.layer.factory.ILayerConverterFactory
-import via.easyflow.core.logger.logger
+import via.easyflow.core.tools.logger.logger
 
 class HashLayerConverterManager<E : Enum<*>>(
     private val convertersMap: HashMap<Pair<E, E>, ILayerConverter<E, E>>,

@@ -28,7 +28,6 @@ datasource:
   driver: &postgresql postgresql
 
 # App
-
 server:
   servlet:
     context-path: /api
@@ -38,6 +37,7 @@ spring:
     compose:
       profiles:
         active: ${PROFILE}
+      lifecycle-management: start_only
   profiles:
     active: ${PROFILE}
   application:
