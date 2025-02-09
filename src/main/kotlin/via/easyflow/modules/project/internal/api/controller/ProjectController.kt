@@ -7,22 +7,21 @@ import reactor.core.publisher.Mono
 import via.easyflow.modules.project.api.controller.IProjectController
 import via.easyflow.modules.project.model.operation.details.ProjectDetailsModel
 import via.easyflow.modules.project.api.service.IProjectService
-import via.easyflow.modules.project.model.exchange.`in`.CreateProjectIn
-import via.easyflow.modules.project.model.operation.details.ProjectMemberViaRoles
+import via.easyflow.modules.project.model.exchange.`in`.UpsertProjectIn
 import via.easyflow.modules.project.model.operation.relation.ProjectModel
 
 @Controller
 class ProjectController(
     private val projectService: IProjectService
 ) : IProjectController {
-    override fun createProject(projectRequest: CreateProjectIn): Mono<ResponseEntity<ProjectDetailsModel>> {
-        val projectOwnerPair = projectService.createProject(projectRequest)
+    override fun upsertProject(projectRequest: UpsertProjectIn): Mono<ResponseEntity<ProjectDetailsModel>> {
+        val projectOwnerPair = projectService.upsertProject(projectRequest)
         val response = projectOwnerPair.map {
             val owner = it.second
             val project = it.first
             ResponseEntity.ok(
                 ProjectDetailsModel(
-                    projectId = project.projectId,
+                    projectId = project.projectId!!,
                     owner = owner,
                     name = project.name,
                     description = project.description,

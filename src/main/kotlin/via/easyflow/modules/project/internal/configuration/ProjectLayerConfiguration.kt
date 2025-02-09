@@ -31,7 +31,7 @@ class ProjectLayerConfiguration(
                 },
                 cv { from: ProjectModel ->
                     ProjectEntity(
-                        projectId = from.projectId,
+                        projectId = from.projectId!!,
                         name = from.name,
                         description = from.description,
                         createdAt = from.createdAt!!
