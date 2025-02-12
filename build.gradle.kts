@@ -17,11 +17,16 @@ java {
 
 repositories {
     mavenCentral()
+
+    mavenLocal()
 }
 
 extra["springModulithVersion"] = "1.1.9"
 
 dependencies {
+    // library import
+//    implementation("via.easyflow:library:0.0.1);
+    implementation("via.easyflow:library")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 //    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 //    implementation("org.springframework.boot:spring-boot-starter-jdbc")
