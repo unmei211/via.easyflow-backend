@@ -113,6 +113,16 @@ package "Project Module" {
     userId : UUID
   }
 
+  entity DefaultProjectRole {
+    * defaultRoleId : UUID
+    * projectId : UUID FK
+    * projectRoleId: UUID FK
+  }
+
+  Project ||--|| DefaultProjectRole
+
+  DefaultProjectRole ||--|| ProjectRole
+
   Project ||--|| ProjectOwner : owns
 
   ProjectRole ||--o{ ProjectMemberRole
