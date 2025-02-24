@@ -8,6 +8,6 @@ import via.easyflow.modules.project.internal.repository.member.model.enquiry.Con
 import via.easyflow.modules.project.internal.repository.member.model.enquiry.GrantRolesToMemberEnquiry
 
 interface IMemberRepository {
-    fun connectMembersToProject(connectMembersEnquiry: ConnectMembersEnquiry): Flux<ProjectMemberEntity>
+    fun connectMembersToProject(connectMembersEnquiry: ConnectMembersEnquiry): Mono<ProjectMemberEntity>
     fun grantRolesToMember(grantEnquiry: GrantRolesToMemberEnquiry): Flux<ProjectMemberRoleEntity>;
 }

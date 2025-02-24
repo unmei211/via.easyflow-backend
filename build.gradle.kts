@@ -62,7 +62,7 @@ dependencies {
     testImplementation("org.springframework.modulith:spring-modulith-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    testImplementation("io.projectreactor:reactor-test")
 }
 
 dependencyManagement {

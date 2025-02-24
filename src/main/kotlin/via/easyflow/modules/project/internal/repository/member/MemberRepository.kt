@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
+import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
 import via.easyflow.modules.project.internal.entity.ProjectMemberRoleEntity
 import via.easyflow.modules.project.internal.repository.member.model.enquiry.ConnectMembersEnquiry
@@ -19,36 +20,48 @@ class MemberRepository(
     private val connectionFactory: ConnectionFactory,
     private val jsonRIO: ReactiveJsonIO
 ) : IMemberRepository {
-    override fun connectMembersToProject(connectMembersEnquiry: ConnectMembersEnquiry): Flux<ProjectMemberEntity> {
-        val members = connectMembersEnquiry.projectMemberEntity
+    private val log = logger()
+    override fun connectMembersToProject(connectMembersEnquiry: ConnectMembersEnquiry): Mono<ProjectMemberEntity> {
+        val member: Mono<ProjectMemberEntity> = connectMembersEnquiry.projectMemberEntity
 
         val sql = """
-            WITH exist_project as (
-                SELECT 1 WHERE EXISTS
-                    (
-                        SELECT 1 from project
-                            WHERE document ->> 'projectId' = :projectId
-                    )
+        WITH exist_project as (
+            SELECT 1 WHERE EXISTS(
+                SELECT 1 from project
+                WHERE document ->> 'projectId' = :projectId
             )
-            INSERT INTO project_member (document) VALUES (:projectMember::jsonb)
-        """.trimIndent()
+        )
+        INSERT INTO project_member (document) 
+            SELECT :projectMemberDocument::jsonb
+                FROM exist_project
+        RETURNING document
+    """.trimIndent()
 
-        return client.inConnection { conn ->
-            val statement = Mono.just(conn.createStatement(sql))
-
-            val memberJsonFlux = members.concatMap { member -> jsonRIO.toJson(member) }.zipWith(members)
-
-            val bindedAccept = memberJsonFlux.flatMap { member ->
-                Mono.from(statement).map { st ->
-                    st
-                        .bind("document", member.t1)
-                        .bind("projectId", member.t2.projectId)
-                        .add()
-                }
-            }.then()
-
-            Mono.zip(statement, bindedAccept).flatMap { Mono.from(it.t1.execute()) }.then()
-        }.flatMapMany { members }
+        return member
+            .doOnNext {
+                log.debug("Current member to connectProject: {}", it)
+            }
+            .flatMap { Mono.zip(jsonRIO.toJson(it), Mono.just(it)) }
+            .flatMap { data ->
+                log.debug("Data to insert: {}", data)
+                client
+                    .sql(sql)
+                    .bind("projectMemberDocument", data.t1)
+                    .bind("projectId", data.t2.projectId)
+                    .map { row ->
+                        log.debug("row: {}", row)
+                        row.get("document", String::class.java)
+                    }
+                    .one()
+                    .switchIfEmpty(Mono.just("lol"))
+                    .doOnError {
+                        log.debug("Error when try insert project member")
+                    }
+                    .doOnNext {
+                        log.debug("wtf + $it")
+                    }
+                    .flatMap { jsonRIO.fromJson(it!!, ProjectMemberEntity::class) }
+            }
     }
 
     override fun grantRolesToMember(grantEnquiry: GrantRolesToMemberEnquiry): Flux<ProjectMemberRoleEntity> {

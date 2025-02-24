@@ -27,6 +27,7 @@ class ProjectRepository(
             .map {
                 objectMapper.readValue((it["document"] as Json).asString(), ProjectEntity::class.java)
             }
+
         return projectEntityFlux
     }
 
@@ -42,10 +43,10 @@ class ProjectRepository(
         """.trimIndent()
 
         val jsonValue = objectMapper.writeValueAsString(project)
-
         return client
             .sql(sql)
             .bind("project", jsonValue)
+
             .then()
     }
 
