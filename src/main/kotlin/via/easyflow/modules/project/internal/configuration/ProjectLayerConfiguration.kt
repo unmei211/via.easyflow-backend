@@ -6,8 +6,8 @@ import via.easyflow.core.layer.LayerType
 import via.easyflow.core.layer.converter.function.cv
 import via.easyflow.core.layer.factory.ILayerConverterFactory
 import via.easyflow.core.layer.manager.HashLayerConverterManager
-import via.easyflow.modules.project.api.models.model.ProjectMemberModel
-import via.easyflow.modules.project.api.models.model.ProjectModel
+import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.modules.project.api.model.ProjectModel
 import via.easyflow.modules.project.internal.entity.ProjectEntity
 import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
 

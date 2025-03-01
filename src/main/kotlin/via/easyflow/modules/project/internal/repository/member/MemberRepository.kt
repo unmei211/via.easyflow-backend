@@ -10,8 +10,8 @@ import via.easyflow.core.tools.json.io.ReactiveJsonIO
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
 import via.easyflow.modules.project.internal.entity.ProjectMemberRoleEntity
-import via.easyflow.modules.project.internal.repository.member.model.enquiry.ConnectMembersEnquiry
-import via.easyflow.modules.project.internal.repository.member.model.enquiry.GrantRolesToMemberEnquiry
+import via.easyflow.modules.project.internal.repository.member.contract.enquiry.ConnectMembersEnquiry
+import via.easyflow.modules.project.internal.repository.member.contract.enquiry.GrantRolesToMemberEnquiry
 
 @Repository
 class MemberRepository(
@@ -53,7 +53,6 @@ class MemberRepository(
                         row.get("document", String::class.java)
                     }
                     .one()
-                    .switchIfEmpty(Mono.just("lol"))
                     .doOnError {
                         log.debug("Error when try insert project member")
                     }

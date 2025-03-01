@@ -11,4 +11,5 @@ interface IProjectRepository {
     fun upsertProject(project: ProjectEntity): Mono<Void>
     fun changeProjectOwner(owner: ProjectOwnerEntity): Mono<Void>
     fun deleteProjectById(id: String): Mono<Void>
+    fun existsProjectById(projectId: String): Mono<Boolean>
 }

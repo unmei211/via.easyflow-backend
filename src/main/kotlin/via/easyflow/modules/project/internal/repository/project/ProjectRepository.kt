@@ -31,6 +31,29 @@ class ProjectRepository(
         return projectEntityFlux
     }
 
+    override fun existsProjectById(projectId: String): Mono<Boolean> {
+        val sql = """
+            SELECT EXISTS (
+                SELECT 1 FROM project
+                WHERE (document ->> 'projectId' = :projectId)
+            ) as project_exists
+        """.trimIndent()
+
+        return client
+            .sql(sql)
+            .bind("projectId", projectId)
+            .map { row ->
+                val projectIsExistsResult = row.get("project_exists", Boolean::class.java)
+                log.debug("project_exists $projectIsExistsResult")
+                projectIsExistsResult
+            }
+            .one()
+            .map { it!! }
+            .doOnNext {
+                log.debug("project_exists $it")
+            }
+    }
+
     override fun getProjectById(projectId: String): Mono<ProjectEntity> {
         TODO("Not yet implemented")
     }
