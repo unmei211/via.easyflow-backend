@@ -20,6 +20,14 @@ class ProjectLayerConfiguration(
             LayerType.ENTITY to LayerType.MODEL
         ).transition {
             listOf(
+                cv { from: ProjectMemberEntity ->
+                    ProjectMemberModel(
+                        memberId = from.projectMemberId,
+                        projectId = from.projectId,
+                        userId = from.userId,
+                        joinedAt = from.joinedAt,
+                    )
+                },
                 cv { from: ProjectEntity ->
                     ProjectModel(
                         projectId = from.projectId,

@@ -14,7 +14,7 @@ import via.easyflow.modules.project.internal.entity.ProjectEntity
 import via.easyflow.modules.project.internal.entity.ProjectOwnerEntity
 import via.easyflow.modules.project.internal.repository.member.MemberRepository
 import via.easyflow.modules.project.internal.repository.project.IProjectRepository
-import java.time.Instant
+import java.time.LocalDateTime
 
 @Service
 class ProjectService(
@@ -44,7 +44,7 @@ class ProjectService(
 
         val projectEntityMono = Mono.just(project)
             .map {
-                it.createdAt = Instant.now()
+                it.createdAt = LocalDateTime.now()
                 it
             }
             .map { entityModelConverter.convert(it to ProjectEntity::class) }

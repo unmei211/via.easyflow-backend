@@ -1,13 +1,15 @@
 package via.easyflow.modules.project.api.model
 
-import java.time.Instant
+import com.fasterxml.jackson.annotation.JsonFormat
+import java.time.LocalDateTime
 
 data class ProjectDetailsModel(
     var projectId: String,
     var name: String,
     var description: String?,
-    var createdAt: Instant,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    var createdAt: LocalDateTime,
 
-    var members: List<ProjectMemberViaRolesModel>,
+    var members: List<ProjectMemberModel>,
     var owner: ProjectOwnerModel,
 )

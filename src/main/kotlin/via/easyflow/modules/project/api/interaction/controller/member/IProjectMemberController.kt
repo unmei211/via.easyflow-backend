@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
+import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
 import via.easyflow.modules.project.api.model.ProjectMemberModel
 import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 
@@ -13,7 +13,7 @@ import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 interface IProjectMemberController {
     @PostMapping("/connect")
     fun connectMembersToProject(
-        @RequestBody connectMembersRequest: ConnectMembersIn,
+        @RequestBody connectMembersRequest: ConnectMembersViaRolesIn,
         @PathVariable projectId: String
     ): ResponseEntity<Flux<ProjectMemberViaRolesModel>>
 

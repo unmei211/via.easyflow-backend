@@ -29,6 +29,7 @@ class UserService(
                 )
             )
         ).map {
+            log.debug("Upserted user [{}]", it.name)
             UserModel(
                 userId = it.userId,
                 name = it.name,

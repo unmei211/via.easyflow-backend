@@ -9,6 +9,7 @@ import via.easyflow.core.layer.manager.IEnumerableLayerConverterManager
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
+import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
 import via.easyflow.modules.project.api.model.ProjectMemberModel
 import via.easyflow.modules.project.api.model.ProjectMemberRoleModel
 import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
@@ -29,11 +30,37 @@ class ProjectMemberService(
     @Qualifier("projectLayerConverter") private val cv: IEnumerableLayerConverterManager<LayerType>
 ) : IProjectMemberService {
     private val log = logger()
-    override fun connectMembers(connectMembersIn: ConnectMembersIn): Flux<ProjectMemberViaRolesModel> {
-        log.info("Starting connectMembers for projectId: ${connectMembersIn.projectId}")
 
-        val projectId: String = connectMembersIn.projectId
-        val userRolesMap: Map<String, List<String>> = connectMembersIn.userToRoles
+    override fun connectMembers(connectMembers: ConnectMembersIn): Flux<ProjectMemberModel> {
+        val projectId = connectMembers.projectId
+        val userIdsFlux = Flux.fromIterable(connectMembers.userIds)
+
+        val connectedMemberFlux: Flux<ProjectMemberEntity> = userIdsFlux.flatMap { id ->
+            memberRepository
+                .connectMembersToProject(
+                    ConnectMembersEnquiry(
+                        Mono.just(
+                            ProjectMemberEntity(
+                                projectMemberId = uuid(),
+                                projectId = projectId,
+                                userId = id,
+                                joinedAt = LocalDateTime.now(),
+                            )
+                        )
+                    )
+                )
+        }
+        return connectedMemberFlux
+            .map { connectedMember ->
+                cv.modelToEntity(connectedMember to ProjectMemberModel::class)
+            }
+    }
+
+    override fun connectMembersViaRoles(connectMembersViaRolesIn: ConnectMembersViaRolesIn): Flux<ProjectMemberViaRolesModel> {
+        log.info("Starting connectMembers for projectId: ${connectMembersViaRolesIn.projectId}")
+
+        val projectId: String = connectMembersViaRolesIn.projectId
+        val userRolesMap: Map<String, List<String>> = connectMembersViaRolesIn.userToRoles
 
         log.debug("Processing ${userRolesMap.size} user-role mappings")
         log.info("Entries: {}", userRolesMap.entries)

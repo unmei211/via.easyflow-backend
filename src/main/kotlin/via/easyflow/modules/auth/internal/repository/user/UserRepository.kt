@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.tools.database.R2dbcMapper
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
-import via.easyflow.modules.auth.api.model.user.UserModel
+import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.auth.internal.entity.UserEntity
 import via.easyflow.modules.auth.internal.repository.user.contract.enquiry.UpsertUserEnquiry
 import via.easyflow.modules.auth.internal.repository.user.contract.query.FindAllUsersQuery
@@ -16,21 +16,31 @@ import via.easyflow.modules.auth.internal.repository.user.contract.query.FindByI
 @Repository
 class UserRepository(
     private val dbClient: DatabaseClient,
-    private val jsonRIO: ReactiveJsonIO,
-    private val r2dbcMapper: R2dbcMapper
+    private val r2dbcMapper: R2dbcMapper,
+    private val jsonRIO: ReactiveJsonIO
 ) : IUserRepository {
+    private val log = logger()
+
     override fun upsert(enquiry: UpsertUserEnquiry): Mono<UserEntity> {
         val sql = """
-            INSERT INTO users (document) VALUES (:user)
+            INSERT INTO users (document) VALUES (:user::jsonb)
             ON CONFLICT ((document ->> 'userId')) 
-                DO UPDATE SET document = EXCLUDED.document || :document
+                DO UPDATE SET document = (users.document || EXCLUDED.document)
             RETURNING document
         """.trimIndent()
-        return dbClient
-            .sql(sql)
-            .bind("user", enquiry)
-            .flatMap { r2dbcMapper.flatMap(it, UserEntity::class) }
-            .next()
+
+        return jsonRIO
+            .toJson(enquiry.user)
+            .flatMap { json ->
+                dbClient
+                    .sql(sql)
+                    .bind("user", json)
+                    .flatMap {
+                        log.debug("Successfully updated user {}", json)
+                        r2dbcMapper.flatMap(it, UserEntity::class)
+                    }
+                    .next()
+            }
     }
 
     override fun findAll(query: FindAllUsersQuery?): Flux<UserEntity> {

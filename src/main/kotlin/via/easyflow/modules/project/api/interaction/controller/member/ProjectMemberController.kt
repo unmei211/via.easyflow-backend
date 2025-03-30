@@ -7,31 +7,28 @@ import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.tools.logger.logger
-import via.easyflow.core.tools.uuid.uuid
-import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
-import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
 import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService
-import java.time.LocalDateTime
 
 @Controller
 class ProjectMemberController(
     private val memberService: IProjectMemberService
 ) : IProjectMemberController {
     private val log = logger()
-    private fun validateConnectMembersToProject(connectMembersRequest: ConnectMembersIn, projectId: String) {
+    private fun validateConnectMembersToProject(connectMembersRequest: ConnectMembersViaRolesIn, projectId: String) {
         if (connectMembersRequest.projectId != projectId) throw ResponseStatusException(HttpStatus.BAD_REQUEST)
     }
 
     override fun connectMembersToProject(
-        connectMembersRequest: ConnectMembersIn,
+        connectMembersRequest: ConnectMembersViaRolesIn,
         projectId: String
     ): ResponseEntity<Flux<ProjectMemberViaRolesModel>> {
         validateConnectMembersToProject(connectMembersRequest, projectId)
 
         return ResponseEntity.ok(
-            memberService.connectMembers(
-                ConnectMembersIn(
+            memberService.connectMembersViaRoles(
+                ConnectMembersViaRolesIn(
                     projectId = projectId,
                     userToRoles = connectMembersRequest.userToRoles
                 )

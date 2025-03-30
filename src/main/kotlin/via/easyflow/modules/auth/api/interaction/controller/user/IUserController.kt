@@ -12,7 +12,7 @@ import via.easyflow.modules.auth.api.contract.out.user.UpsertUserOut
 @RequestMapping("/auth/user")
 interface IUserController {
     @PostMapping("/upsert")
-    fun upsert(upsertIn: UpsertUserIn): Mono<ResponseEntity<UpsertUserOut>>
+    fun upsert(@RequestBody upsertIn: UpsertUserIn): Mono<ResponseEntity<UpsertUserOut>>
 
     @GetMapping("/{userId}/exists")
     fun existsUser(@ModelAttribute existsIn: ExistsUserIn): Mono<ResponseEntity<ExistsUserOut>>

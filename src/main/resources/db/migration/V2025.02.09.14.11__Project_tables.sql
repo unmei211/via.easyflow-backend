@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS project_member
     document jsonb
 );
 CREATE UNIQUE INDEX ON project_member ((document ->> 'projectMemberId'));
-CREATE UNIQUE INDEX ON project_owner ((document ->> 'projectId'));
+CREATE UNIQUE INDEX ON project_member ((document ->> 'userId'), (document ->> 'projectId'));
 
 -- ProjectRole
 CREATE TABLE IF NOT EXISTS project_role
