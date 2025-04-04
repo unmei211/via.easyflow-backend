@@ -8,10 +8,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.project.internal.entity.ProjectEntity
-import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
-import via.easyflow.modules.project.internal.entity.ProjectMemberRoleEntity
 import via.easyflow.modules.project.internal.entity.ProjectOwnerEntity
-import via.easyflow.modules.project.model.operation.details.ProjectMemberViaRoles
 
 @Repository
 class ProjectRepository(
@@ -30,7 +27,31 @@ class ProjectRepository(
             .map {
                 objectMapper.readValue((it["document"] as Json).asString(), ProjectEntity::class.java)
             }
+
         return projectEntityFlux
+    }
+
+    override fun existsProjectById(projectId: String): Mono<Boolean> {
+        val sql = """
+            SELECT EXISTS (
+                SELECT 1 FROM project
+                WHERE (document ->> 'projectId' = :projectId)
+            ) as project_exists
+        """.trimIndent()
+
+        return client
+            .sql(sql)
+            .bind("projectId", projectId)
+            .map { row ->
+                val projectIsExistsResult = row.get("project_exists", Boolean::class.java)
+                log.debug("project_exists $projectIsExistsResult")
+                projectIsExistsResult
+            }
+            .one()
+            .map { it!! }
+            .doOnNext {
+                log.debug("project_exists $it")
+            }
     }
 
     override fun getProjectById(projectId: String): Mono<ProjectEntity> {
@@ -45,10 +66,10 @@ class ProjectRepository(
         """.trimIndent()
 
         val jsonValue = objectMapper.writeValueAsString(project)
-
         return client
             .sql(sql)
             .bind("project", jsonValue)
+
             .then()
     }
 

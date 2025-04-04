@@ -34,8 +34,5 @@ services:
       - "5443:5432"
     profiles:
       - local
-volumes:
-  pgdata:
-
 networks:
   app-network:
