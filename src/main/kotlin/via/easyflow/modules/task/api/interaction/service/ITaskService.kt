@@ -1,13 +1,14 @@
 package via.easyflow.modules.task.api.interaction.service
 
-import org.springframework.scheduling.config.Task
-import via.easyflow.modules.task.api.interaction.contract.`in`.AddTasksIn
-import via.easyflow.modules.task.api.interaction.contract.`in`.GetTasksByProjectIn
-import via.easyflow.modules.task.api.interaction.contract.`in`.GetTasksByUserIn
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import via.easyflow.modules.task.api.contract.`in`.*
+import via.easyflow.modules.task.api.model.base.TaskModel
 
 interface ITaskService {
-    fun addTasks(addTasksIn: AddTasksIn)
+    fun addTasks(addTasksIn: AddTasksIn): Flux<TaskModel>
     fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): List<Any>
     fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn)
+    fun getTaskById(getTaskByIdIn: GetTaskByIdIn): Mono<TaskModel>
     fun changeTask(changeTaskIn: ChangeTaskIn)
 }

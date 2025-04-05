@@ -1,6 +1,7 @@
 package via.easyflow.core.tools.json.binder
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.r2dbc.postgresql.codec.Json
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
@@ -23,4 +24,8 @@ class ReactiveJsonBinder(
 
     override fun <T : Any> fromJson(json: Mono<String>, clazz: KClass<T>): Mono<T> =
         json.map { objectMapper.readValue(it, clazz.java) }.subscribeOn(Schedulers.boundedElastic())
+
+    override fun <T : Any> fromJson(json: Json, clazz: KClass<T>): Mono<T> {
+        return Mono.just(objectMapper.readValue(json.asString(), clazz.java)).subscribeOn(Schedulers.boundedElastic())
+    }
 }

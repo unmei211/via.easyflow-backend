@@ -1,4 +1,4 @@
-package via.easyflow.modules.task.api.interaction.contract.`in`
+package via.easyflow.modules.task.api.contract.`in`
 
 class GetTasksByUserIn(
     val userId: String,

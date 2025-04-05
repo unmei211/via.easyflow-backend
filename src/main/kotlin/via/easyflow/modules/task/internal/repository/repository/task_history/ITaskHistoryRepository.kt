@@ -1,7 +1,7 @@
-package via.easyflow.modules.task.internal.repository.task_history
+package via.easyflow.modules.task.internal.repository.repository.task_history
 
 import reactor.core.publisher.Mono
-import via.easyflow.modules.task.internal.entity.TaskHistoryEntity
+import via.easyflow.modules.task.internal.repository.model.TaskHistoryEntity
 
 interface ITaskHistoryRepository {
     fun add(taskHistory: TaskHistoryEntity): Mono<TaskHistoryEntity>;

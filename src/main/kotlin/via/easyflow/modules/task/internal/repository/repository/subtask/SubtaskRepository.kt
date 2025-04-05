@@ -1,7 +1,7 @@
-package via.easyflow.modules.task.internal.repository.subtask
+package via.easyflow.modules.task.internal.repository.repository.subtask
 
 import reactor.core.publisher.Mono
-import via.easyflow.modules.task.internal.entity.SubtaskEntity
+import via.easyflow.modules.task.internal.repository.model.SubtaskEntity
 
 class SubtaskRepository : ISubtaskRepository {
     override fun add(subtask: SubtaskEntity): Mono<SubtaskEntity> {

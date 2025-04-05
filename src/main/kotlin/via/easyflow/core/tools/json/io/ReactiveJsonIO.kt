@@ -1,5 +1,6 @@
 package via.easyflow.core.tools.json.io
 
+import io.r2dbc.postgresql.codec.Json
 import reactor.core.publisher.Mono
 import kotlin.reflect.KClass
 
@@ -9,4 +10,5 @@ interface ReactiveJsonIO {
 
     fun <T : Any> fromJson(json: String, clazz: KClass<T>): Mono<T>
     fun <T : Any> fromJson(json: Mono<String>, clazz: KClass<T>): Mono<T>
+    fun <T : Any> fromJson(json: Json, clazz: KClass<T>): Mono<T>
 }

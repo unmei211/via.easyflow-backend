@@ -1,4 +1,4 @@
-package via.easyflow.modules.task.internal.entity
+package via.easyflow.modules.task.internal.repository.model
 
 import java.time.Instant
 

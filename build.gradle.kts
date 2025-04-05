@@ -24,9 +24,8 @@ repositories {
 extra["springModulithVersion"] = "1.1.9"
 
 dependencies {
+    implementation("com.bucket4j:bucket4j-core:8.10.1")
     // library import
-//    implementation("via.easyflow:library:0.0.1);
-    implementation("via.easyflow:library")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 //    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 //    implementation("org.springframework.boot:spring-boot-starter-jdbc")
