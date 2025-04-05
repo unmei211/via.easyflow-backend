@@ -5,8 +5,9 @@ import io.r2dbc.postgresql.codec.Json
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
-import via.easyflow.core.exception.NotFoundException
+import via.easyflow.core.exception.ConflictException
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
+import via.easyflow.modules.task.internal.repository.contract.UpdateTaskMutation
 import via.easyflow.modules.task.internal.repository.model.TaskEntity
 
 @Repository
@@ -41,19 +42,57 @@ class TaskRepository(
                 .sql(sql)
                 .bind("taskId", it)
                 .fetch()
-                .first()
-        }.flatMap { row ->
-            val document = row["document"]
-            if (document == null) {
-                Mono.error(NotFoundException("f"))
-            } else {
-                jsonRIO.fromJson(document as Json, TaskEntity::class)
-            }
+                .one()
         }
+            .flatMap { row ->
+                val document = row["document"]
+                if (document == null) {
+                    Mono.error(IllegalArgumentException("document is null"))
+                } else {
+                    jsonRIO.fromJson(document as Json, TaskEntity::class)
+                }
+            }
     }
 
-    override fun update(task: TaskEntity): Mono<TaskEntity> {
-        TODO("Not yet implemented")
+    override fun update(mutation: UpdateTaskMutation): Mono<TaskEntity> {
+        val sql = """
+            UPDATE task SET document = :document::jsonb
+            WHERE 
+            (document ->> 'taskId' = :taskId) and 
+            (document ->> 'version' = :version) and
+            (document ->> 'projectId' = :projectId)
+        """.trimIndent()
+
+        val jsonMono = Mono.from(jsonRIO.toJson(mutation.taskEntity))
+
+        val argsMono = Mono
+            .just(mutableMapOf<String, Any>())
+            .map { arg ->
+                arg["version"] = mutation.currentVersion
+                arg["taskId"] = mutation.taskEntity.taskId
+                arg["projectId"] = mutation.taskEntity.projectId
+                arg
+            }
+
+        val args: Mono<Map<String, Any>> = jsonMono.flatMap { json ->
+            argsMono.map { args ->
+                args["document"] = json
+                args
+            }
+        }
+
+        return args.flatMap { arg ->
+            client.sql(sql)
+                .bindValues(arg)
+                .fetch()
+                .rowsUpdated()
+        }.flatMap { rowsUpdated ->
+            if (rowsUpdated == 0L) {
+                Mono.error(ConflictException("Conflict"))
+            } else {
+                Mono.just(mutation.taskEntity)
+            }
+        }
     }
 
     override fun deleteById(taskId: String): Mono<String> {

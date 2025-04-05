@@ -1,6 +1,5 @@
 package via.easyflow.modules.task.internal.repository.model
 
-import via.easyflow.modules.task.api.model.base.TaskModel
 import java.time.Instant
 
 data class TaskEntity(
@@ -11,7 +10,8 @@ data class TaskEntity(
     val createdAt: Instant,
     val updatedAt: Instant?,
     val ownerUserId: String,
-    val projectId: String
+    val projectId: String,
+    val version: String
 ) {
 
 }

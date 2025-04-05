@@ -11,7 +11,8 @@ data class TaskModel(
     val createdAt: Instant?,
     val updatedAt: Instant?,
     val ownerUserId: String,
-    val projectId: String
+    val projectId: String,
+    val version: String
 ) {
     fun toEntity(): TaskEntity {
         return TaskEntity(
@@ -22,7 +23,8 @@ data class TaskModel(
             createdAt = createdAt!!,
             updatedAt = updatedAt,
             ownerUserId = ownerUserId,
-            projectId = projectId
+            projectId = projectId,
+            version = version
         )
     }
 
@@ -37,6 +39,7 @@ data class TaskModel(
                 updatedAt = entity.updatedAt,
                 ownerUserId = entity.ownerUserId,
                 projectId = entity.projectId,
+                version = entity.version,
             )
         }
     }

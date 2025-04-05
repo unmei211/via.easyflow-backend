@@ -4,7 +4,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import via.easyflow.core.api.out.exception.BadRequestExceptionOut
+import via.easyflow.core.api.out.exception.ConflictExceptionOut
 import via.easyflow.core.api.out.exception.NotFoundExceptionOut
+import via.easyflow.core.exception.BadRequestException
+import via.easyflow.core.exception.ConflictException
 import via.easyflow.core.exception.NotFoundException
 import via.easyflow.core.tools.logger.logger
 
@@ -20,6 +24,24 @@ class ExceptionHandler {
         return ResponseEntity(
             NotFoundExceptionOut(ex.errors, ex.message ?: ""),
             HttpStatus.NOT_FOUND
+        )
+    }
+
+    @ExceptionHandler(ConflictException::class)
+    fun handleDataAccessException(ex: ConflictException): ResponseEntity<ConflictExceptionOut> {
+        log.error(ex.message, ex)
+        return ResponseEntity(
+            ConflictExceptionOut(ex.errors, ex.message ?: ""),
+            HttpStatus.CONFLICT
+        )
+    }
+
+    @ExceptionHandler(BadRequestException::class)
+    fun handleDataAccessException(ex: BadRequestException): ResponseEntity<BadRequestExceptionOut> {
+        log.error(ex.message, ex)
+        return ResponseEntity(
+            BadRequestExceptionOut(ex.errors, ex.message ?: ""),
+            HttpStatus.BAD_REQUEST
         )
     }
 //    }

@@ -10,5 +10,5 @@ interface ITaskService {
     fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): List<Any>
     fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn)
     fun getTaskById(getTaskByIdIn: GetTaskByIdIn): Mono<TaskModel>
-    fun changeTask(changeTaskIn: ChangeTaskIn)
+    fun changeTask(changeTaskIn: ChangeTaskIn): Mono<TaskModel>
 }

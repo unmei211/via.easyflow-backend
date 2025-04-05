@@ -1,7 +1,10 @@
 package via.easyflow.modules.task.api.contract.`in`
 
+import via.easyflow.modules.task.api.contract.`in`.view.ChangeTaskView
+
 data class ChangeTaskIn(
-    val task: Any,
-    val taskId: String
+    val task: ChangeTaskView,
+    val taskId: String,
+    val version: String
 ) {
 }
