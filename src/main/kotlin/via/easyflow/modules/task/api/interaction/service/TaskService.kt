@@ -91,10 +91,13 @@ class TaskService(
                         taskEntity = new.toEntity(),
                         currentVersion = changeTaskIn.version,
                     )
-                ).map { prev to it }
-            }.doOnNext { (prev, new) ->
-                taskHistoryService.writeTaskHistory(WriteTaskHistoryIn(task = prev))
+                )
+                    .map { prev to it }
             }
-            .map { (prev, new) -> TaskModel.from(new) }
+            .flatMap { (prev, updated) ->
+                taskHistoryService.writeTaskHistory(WriteTaskHistoryIn(task = prev))
+                    .map { prev to updated }
+            }
+            .map { (prev, updated) -> TaskModel.from(updated) }
     }
 }

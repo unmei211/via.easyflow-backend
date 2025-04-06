@@ -1,6 +1,5 @@
 package via.easyflow.modules.task.internal.repository.repository.task
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.r2dbc.postgresql.codec.Json
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
@@ -14,7 +13,7 @@ import via.easyflow.modules.task.internal.repository.model.TaskEntity
 @Repository
 class TaskRepository(
     private val client: DatabaseClient,
-        private val jsonRIO: ReactiveJsonIO,
+    private val jsonRIO: ReactiveJsonIO,
     private val argsFactory: IArgumentsHandlerFactory
 ) : ITaskRepository {
     override fun add(task: TaskEntity): Mono<TaskEntity> {
