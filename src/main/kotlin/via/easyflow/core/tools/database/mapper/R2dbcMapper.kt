@@ -1,4 +1,4 @@
-package via.easyflow.core.tools.database
+package via.easyflow.core.tools.database.mapper
 
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono

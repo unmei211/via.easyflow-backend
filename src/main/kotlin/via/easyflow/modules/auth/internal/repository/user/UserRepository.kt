@@ -4,7 +4,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import via.easyflow.core.tools.database.R2dbcMapper
+import via.easyflow.core.tools.database.mapper.R2dbcMapper
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.auth.internal.entity.UserEntity

@@ -6,6 +6,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import via.easyflow.core.exception.ConflictException
+import via.easyflow.core.tools.database.arguments.factory.IArgumentsHandlerFactory
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
 import via.easyflow.modules.task.internal.repository.contract.UpdateTaskMutation
 import via.easyflow.modules.task.internal.repository.model.TaskEntity
@@ -13,8 +14,8 @@ import via.easyflow.modules.task.internal.repository.model.TaskEntity
 @Repository
 class TaskRepository(
     private val client: DatabaseClient,
-    private val objectMapper: ObjectMapper,
-    private val jsonRIO: ReactiveJsonIO
+        private val jsonRIO: ReactiveJsonIO,
+    private val argsFactory: IArgumentsHandlerFactory
 ) : ITaskRepository {
     override fun add(task: TaskEntity): Mono<TaskEntity> {
         val sql = """
@@ -63,27 +64,16 @@ class TaskRepository(
             (document ->> 'projectId' = :projectId)
         """.trimIndent()
 
-        val jsonMono = Mono.from(jsonRIO.toJson(mutation.taskEntity))
+        val argsMono = argsFactory.getR2dbc()
 
-        val argsMono = Mono
-            .just(mutableMapOf<String, Any>())
-            .map { arg ->
-                arg["version"] = mutation.currentVersion
-                arg["taskId"] = mutation.taskEntity.taskId
-                arg["projectId"] = mutation.taskEntity.projectId
-                arg
-            }
-
-        val args: Mono<Map<String, Any>> = jsonMono.flatMap { json ->
-            argsMono.map { args ->
-                args["document"] = json
-                args
-            }
-        }
-
-        return args.flatMap { arg ->
+        return argsMono.bind(
+            "version" to mutation.currentVersion,
+            "taskId" to mutation.taskEntity.taskId,
+            "projectId" to mutation.taskEntity.projectId,
+            "document" to mutation.taskEntity
+        ).flatMap { args ->
             client.sql(sql)
-                .bindValues(arg)
+                .bindValues(args.getMap())
                 .fetch()
                 .rowsUpdated()
         }.flatMap { rowsUpdated ->

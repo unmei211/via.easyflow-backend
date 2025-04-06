@@ -17,6 +17,7 @@ import java.time.Instant
 @Service
 class TaskService(
     private val taskRepository: ITaskRepository,
+    private val taskHistoryService: ITaskHistoryService,
     private val versionizer: IVersionizer<Timestamp>,
     private val versionComparator: IVersionComparator<Timestamp>,
 ) : ITaskService {
@@ -80,16 +81,20 @@ class TaskService(
                     projectId = existsTask.projectId,
                     version = versionizer.go(),
                 )
-                forUpdateTask
+                existsTask to forUpdateTask
             }
 
-        return forUpdateMono.flatMap { task ->
-            taskRepository.update(
-                UpdateTaskMutation(
-                    taskEntity = task.toEntity(),
-                    currentVersion = changeTaskIn.version,
-                )
-            )
-        }.map { TaskModel.from(it) }
+        return forUpdateMono
+            .flatMap { (prev, new) ->
+                taskRepository.update(
+                    UpdateTaskMutation(
+                        taskEntity = new.toEntity(),
+                        currentVersion = changeTaskIn.version,
+                    )
+                ).map { prev to it }
+            }.doOnNext { (prev, new) ->
+                taskHistoryService.writeTaskHistory(WriteTaskHistoryIn(task = prev))
+            }
+            .map { (prev, new) -> TaskModel.from(new) }
     }
 }
