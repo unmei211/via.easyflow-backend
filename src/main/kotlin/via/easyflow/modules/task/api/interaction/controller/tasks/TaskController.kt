@@ -1,4 +1,4 @@
-package via.easyflow.modules.task.api.interaction.controller
+package via.easyflow.modules.task.api.interaction.controller.tasks
 
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller

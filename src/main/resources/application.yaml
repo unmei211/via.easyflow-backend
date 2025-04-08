@@ -9,7 +9,6 @@ logging:
       easyflow: DEBUG
     org:
       springframework: DEBUG
-
 management:
   endpoint:
     health:

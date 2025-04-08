@@ -54,8 +54,8 @@ class TaskService(
             }
     }
 
-    override fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): List<Any> {
-        TODO("Not yet implemented")
+    override fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): Flux<TaskModel> {
+        taskRepository.searchByUserId()
     }
 
     override fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn) {

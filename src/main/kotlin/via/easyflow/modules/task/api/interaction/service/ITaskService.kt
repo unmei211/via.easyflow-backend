@@ -7,7 +7,7 @@ import via.easyflow.modules.task.api.model.base.TaskModel
 
 interface ITaskService {
     fun addTasks(addTasksIn: AddTasksIn): Flux<TaskModel>
-    fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): List<Any>
+    fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): Flux<TaskModel>
     fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn)
     fun getTaskById(getTaskByIdIn: GetTaskByIdIn): Mono<TaskModel>
     fun changeTask(changeTaskIn: ChangeTaskIn): Mono<TaskModel>

@@ -1,5 +1,6 @@
-package via.easyflow.modules.task.api.interaction.controller
+package via.easyflow.modules.task.api.interaction.controller.tasks
 
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
@@ -8,7 +9,7 @@ import via.easyflow.modules.task.api.contract.`in`.ChangeTaskIn
 import via.easyflow.modules.task.api.model.base.TaskModel
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/tasks", produces = [MediaType.APPLICATION_NDJSON_VALUE])
 interface ITaskController {
     @PostMapping()
     fun addTask(@RequestBody taskIn: AddTasksIn): Mono<ResponseEntity<TaskModel>>
