@@ -14,10 +14,9 @@ import via.easyflow.modules.task.api.model.base.TaskModel
 @RequestMapping("/user/{userId}/project/{projectId}/tasks", produces = [MediaType.APPLICATION_NDJSON_VALUE])
 interface IUserProjectTasksController {
 
-    @GetMapping("/{taskId}")
+    @GetMapping()
     fun getTasksByUserId(
         @PathVariable userId: String,
         @PathVariable projectId: String,
-        @PathVariable taskId: String
     ): Mono<ResponseEntity<Flux<TaskModel>>>
 }

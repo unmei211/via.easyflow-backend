@@ -90,12 +90,12 @@ class TaskRepository(
         }
     }
 
-    override fun searchFilter(filters: List<IQueryFilter>): Flux<TaskEntity> {
-        val sql = """"""
+    override fun searchByFilter(filters: List<IQueryFilter>): Flux<TaskEntity> {
+        val sql = """
+            SELECT document FROM task WHERE ${queryBuilder.build(filters)}
+        """.trimIndent()
 
-        val sqlViaFilters = queryBuilder.merge(filters, sql)
-
-        val specs: DatabaseClient.GenericExecuteSpec = client.sql(sqlViaFilters)
+        val specs: DatabaseClient.GenericExecuteSpec = client.sql(sql)
 
         val specsMono: Mono<DatabaseClient.GenericExecuteSpec> = paramMapper.fill(
             filters,

@@ -1,16 +1,20 @@
-package via.easyflow.modules.task.api.interaction.service
+package via.easyflow.modules.task.internal.service
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.exception.NotFoundException
+import via.easyflow.core.tools.database.query.resolver.IQueryFiltersResolver
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.core.tools.version.comparator.IVersionComparator
 import via.easyflow.core.tools.version.versionizer.IVersionizer
 import via.easyflow.modules.task.api.contract.`in`.*
+import via.easyflow.modules.task.api.interaction.service.ITaskHistoryService
+import via.easyflow.modules.task.api.interaction.service.ITaskService
 import via.easyflow.modules.task.api.model.base.TaskModel
 import via.easyflow.modules.task.internal.repository.contract.UpdateTaskMutation
 import via.easyflow.modules.task.internal.repository.repository.task.ITaskRepository
+import via.easyflow.modules.task.internal.service.filter.user_task.model.UserTaskFilterModel
 import java.sql.Timestamp
 import java.time.Instant
 
@@ -20,6 +24,7 @@ class TaskService(
     private val taskHistoryService: ITaskHistoryService,
     private val versionizer: IVersionizer<Timestamp>,
     private val versionComparator: IVersionComparator<Timestamp>,
+    private val userTaskFilterResolver: IQueryFiltersResolver<UserTaskFilterModel>
 ) : ITaskService {
     override fun getTaskById(getTaskByIdIn: GetTaskByIdIn): Mono<TaskModel> {
         return taskRepository
@@ -55,7 +60,15 @@ class TaskService(
     }
 
     override fun getTasksByUser(getTasksByUserIn: GetTasksByUserIn): Flux<TaskModel> {
-        taskRepository.searchByUserId()
+        val filters = userTaskFilterResolver.resolve(
+            UserTaskFilterModel(
+                projectId = getTasksByUserIn.projectId,
+                userId = getTasksByUserIn.userId
+            )
+        )
+
+        return taskRepository.searchByFilter(filters)
+            .map { taskModel -> TaskModel.from(taskModel) }
     }
 
     override fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn) {

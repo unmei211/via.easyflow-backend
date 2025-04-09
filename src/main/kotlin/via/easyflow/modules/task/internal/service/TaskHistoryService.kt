@@ -1,9 +1,10 @@
-package via.easyflow.modules.task.api.interaction.service
+package via.easyflow.modules.task.internal.service
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.modules.task.api.contract.`in`.WriteTaskHistoryIn
+import via.easyflow.modules.task.api.interaction.service.ITaskHistoryService
 import via.easyflow.modules.task.internal.repository.model.TaskHistoryEntity
 import via.easyflow.modules.task.internal.repository.repository.task_history.ITaskHistoryRepository
 import java.time.Instant
