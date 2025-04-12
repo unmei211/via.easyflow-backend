@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import via.easyflow.core.tools.database.query.condition.IConditionWrapper
 import via.easyflow.core.tools.database.query.filter.IQueryFilter
+import via.easyflow.core.tools.database.query.filter.embedded.ProjectIdQueryFilter
 import via.easyflow.core.tools.database.query.filter.embedded.UserIdQueryFilter
 import via.easyflow.core.tools.database.query.resolver.IQueryFiltersResolver
 import via.easyflow.modules.project.api.interaction.service.filter.model.ProjectMemberFilterModel
@@ -19,7 +20,7 @@ final class ProjectMemberFiltersResolver(
 
     private fun resolveProjectIdFilter(model: ProjectMemberFilterModel): IQueryFilter? =
         model.projectId?.let {
-            UserIdQueryFilter(model.projectId, jsonbWrapper)
+            ProjectIdQueryFilter(model.projectId, jsonbWrapper)
         }
 
     private fun resolveUserIdFilter(model: ProjectMemberFilterModel): IQueryFilter? =

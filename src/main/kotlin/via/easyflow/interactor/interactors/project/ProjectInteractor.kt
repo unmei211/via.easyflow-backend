@@ -1,22 +1,53 @@
 package via.easyflow.interactor.interactors.project
 
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
-import via.easyflow.interactor.usecases.project.ConnectOwnerToProjectCase
-import via.easyflow.interactor.usecases.project.ConnectOwnerToProjectCaseInput
-import via.easyflow.interactor.usecases.project.CreateProjectCase
-import via.easyflow.interactor.usecases.project.CreateProjectCaseInput
+import via.easyflow.interactor.usecases.project.*
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
+import via.easyflow.interactor.usecases.user.UsersMustBeAvailableCase
+import via.easyflow.interactor.usecases.user.UsersMustBeAvailableCaseInput
 import via.easyflow.modules.project.api.model.ProjectDetailsModel
+import via.easyflow.modules.project.api.model.ProjectMemberModel
 
 @Component
 class ProjectInteractor(
     private val userIsAvailableCase: UserMustBeAvailableCase,
+    private val usersMustBeAvailableCase: UsersMustBeAvailableCase,
+    private val usersMustNotBeInProjectCase: UsersMustNotBeInProjectCase,
+
     private val createProjectCase: CreateProjectCase,
-    private val connectOwnerToProjectCase: ConnectOwnerToProjectCase
+    private val connectOwnerToProjectCase: ConnectOwnerToProjectCase,
+    private val connectProjectMembersCase: ConnectProjectMembersCase,
 ) : IProjectInteractor {
+    override fun connectMembers(input: ConnectProjectMembersInteractorInput): Flux<ProjectMemberModel> {
+        val usersToProjectValidated = usersMustNotBeInProjectCase.invoke(
+            input = UsersNotInProjectCaseInput(
+                projectId = input.projectId,
+                userIds = input.userIds
+            )
+        )
+
+        val usersAvailableValidated = usersMustBeAvailableCase.invoke(
+            UsersMustBeAvailableCaseInput(
+                userIds = input.userIds
+            )
+        )
+
+        return usersAvailableValidated.zipWith(usersToProjectValidated)
+            .thenMany(
+                connectProjectMembersCase.invoke(
+                    ConnectProjectMembersCaseInput(
+                        projectId = input.projectId,
+                        userIds = input.userIds
+                    )
+                )
+            )
+    }
+
     override fun createProject(input: CreateProjectInteractorInput): Mono<ProjectDetailsModel> {
         val userValidated = userIsAvailableCase.invoke(
             UserMustBeAvailableUseCaseInput(
