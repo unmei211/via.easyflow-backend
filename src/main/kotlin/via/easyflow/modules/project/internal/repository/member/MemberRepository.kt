@@ -6,6 +6,9 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import via.easyflow.core.tools.database.query.builder.IQueryBuilder
+import via.easyflow.core.tools.database.query.filter.IQueryFilter
+import via.easyflow.core.tools.database.query.param.filler.IQueryParamMapper
 import via.easyflow.core.tools.json.io.ReactiveJsonIO
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
@@ -18,9 +21,30 @@ class MemberRepository(
     private val client: DatabaseClient,
     private val objectMapper: ObjectMapper,
     private val connectionFactory: ConnectionFactory,
-    private val jsonRIO: ReactiveJsonIO
+    private val jsonRIO: ReactiveJsonIO,
+    private val queryBuilder: IQueryBuilder,
+    private val paramMapper: IQueryParamMapper<DatabaseClient.GenericExecuteSpec, Mono<DatabaseClient.GenericExecuteSpec>>
 ) : IMemberRepository {
     private val log = logger()
+
+    override fun existsMemberByFilters(filters: List<IQueryFilter>): Mono<Boolean> {
+        val sql = """
+            SELECT EXISTS(SELECT 1 FROM project_member WHERE ${queryBuilder.build(filters)}) as exists;    
+        """.trimIndent()
+
+        val specs = paramMapper.fillByFilters(
+            filters,
+            client.sql(sql)
+        )
+
+        return specs.flatMap {
+            it
+                .fetch()
+                .one()
+                .map { row -> row["exists"] as Boolean }
+        }
+    }
+
     override fun connectMembersToProject(connectMembersEnquiry: ConnectMembersEnquiry): Mono<ProjectMemberEntity> {
         val member: Mono<ProjectMemberEntity> = connectMembersEnquiry.projectMemberEntity
 

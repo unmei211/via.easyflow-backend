@@ -1,6 +1,7 @@
 package via.easyflow.modules.project.api.interaction.service.role
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.core.layer.LayerType
 import via.easyflow.core.layer.manager.IEnumerableLayerConverterManager
@@ -12,6 +13,7 @@ import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 import via.easyflow.modules.project.internal.entity.ProjectDefaultRoleEntity
 import via.easyflow.modules.project.internal.repository.role.RoleRepository
 
+@Component
 class ProjectRoleService(
     private val roleRepository: RoleRepository,
     @Qualifier("projectLayerConverter") private val converterManager: IEnumerableLayerConverterManager<LayerType>

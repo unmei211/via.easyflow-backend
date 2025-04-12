@@ -5,14 +5,13 @@ import via.easyflow.core.tools.database.query.filter.IQueryFilter
 
 @Component
 class SimpleQueryBuilder : IQueryBuilder {
-    private val prefix = "1 = 1";
-
     override fun build(filters: List<IQueryFilter>): String {
-        val sqlFilter = StringBuilder(prefix)
-        filters.forEach { filter ->
-            sqlFilter.append(filter.filter())
-        }
-        return sqlFilter.toString()
+        val sqlFilter = filters.joinToString(
+            separator = " ",
+            prefix = "1=1 ",
+            postfix = " ",
+        ) { it.filter() }
+        return sqlFilter
     }
 
     override fun merge(filters: List<IQueryFilter>, sql: String): String {

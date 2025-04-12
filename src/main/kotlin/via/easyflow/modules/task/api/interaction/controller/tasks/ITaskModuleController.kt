@@ -9,8 +9,8 @@ import via.easyflow.modules.task.api.contract.`in`.ChangeTaskIn
 import via.easyflow.modules.task.api.model.base.TaskModel
 
 @RestController
-@RequestMapping("/tasks", produces = [MediaType.APPLICATION_NDJSON_VALUE])
-interface ITaskController {
+@RequestMapping("/module/tasks", produces = [MediaType.APPLICATION_NDJSON_VALUE])
+interface ITaskModuleController {
     @PostMapping()
     fun addTask(@RequestBody taskIn: AddTasksIn): Mono<ResponseEntity<TaskModel>>
 

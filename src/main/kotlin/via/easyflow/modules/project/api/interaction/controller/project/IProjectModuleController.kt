@@ -9,8 +9,8 @@ import via.easyflow.modules.project.api.contract.`in`.project.UpsertProjectIn
 import via.easyflow.modules.project.api.model.ProjectModel
 
 @RestController
-@RequestMapping("/projects")
-interface IProjectController {
+@RequestMapping("/module/projects")
+interface IProjectModuleController {
     @PostMapping("/create")
     fun upsertProject(@RequestBody projectRequest: UpsertProjectIn): Mono<
             ResponseEntity<ProjectDetailsModel>>

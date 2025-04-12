@@ -9,19 +9,20 @@ import via.easyflow.modules.task.api.interaction.service.ITaskService
 import via.easyflow.modules.task.api.model.base.TaskModel
 
 @Controller
-class UserProjectTasksController(
+class UserProjectTasksModuleController(
     private val taskService: ITaskService,
-) : IUserProjectTasksController {
+) : IUserProjectTasksModuleController {
 
     override fun getTasksByUserId(
         userId: String,
         projectId: String,
+        limit: Long?,
     ): Mono<ResponseEntity<Flux<TaskModel>>> {
         val result: Mono<ResponseEntity<Flux<TaskModel>>> = Mono.just(
             ResponseEntity.ok(
                 taskService.getTasksByUser(
                     GetTasksByUserIn(
-                        userId, projectId
+                        userId, projectId, limit
                     )
                 )
             )

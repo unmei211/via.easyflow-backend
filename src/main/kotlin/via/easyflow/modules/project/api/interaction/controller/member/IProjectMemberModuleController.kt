@@ -5,12 +5,11 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
-import via.easyflow.modules.project.api.model.ProjectMemberModel
 import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 
 @RestController
-@RequestMapping("/projects/{projectId}/members")
-interface IProjectMemberController {
+@RequestMapping("/module/projects/{projectId}/members")
+interface IProjectMemberModuleController {
     @PostMapping("/connect")
     fun connectMembersToProject(
         @RequestBody connectMembersRequest: ConnectMembersViaRolesIn,

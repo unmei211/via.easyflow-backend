@@ -6,16 +6,18 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.layer.LayerType
 import via.easyflow.core.layer.manager.IEnumerableLayerConverterManager
+import via.easyflow.core.tools.database.query.resolver.IQueryFiltersResolver
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
+import via.easyflow.modules.project.api.interaction.service.filter.model.ProjectMemberFilterModel
 import via.easyflow.modules.project.api.model.ProjectMemberModel
 import via.easyflow.modules.project.api.model.ProjectMemberRoleModel
 import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
 import via.easyflow.modules.project.internal.entity.ProjectMemberRoleEntity
-import via.easyflow.modules.project.internal.repository.member.MemberRepository
+import via.easyflow.modules.project.internal.repository.member.IMemberRepository
 import via.easyflow.modules.project.internal.repository.member.contract.enquiry.ConnectMembersEnquiry
 import via.easyflow.modules.project.internal.repository.member.contract.enquiry.GrantRolesToMemberEnquiry
 import java.time.LocalDateTime
@@ -26,10 +28,22 @@ fun <T : Any, U : Any> IEnumerableLayerConverterManager<LayerType>.modelToEntity
 
 @Service
 class ProjectMemberService(
-    private val memberRepository: MemberRepository,
-    @Qualifier("projectLayerConverter") private val cv: IEnumerableLayerConverterManager<LayerType>
+    private val memberRepository: IMemberRepository,
+    @Qualifier("projectLayerConverter") private val cv: IEnumerableLayerConverterManager<LayerType>,
+    private val projectMemberFilterResolver: IQueryFiltersResolver<ProjectMemberFilterModel>
 ) : IProjectMemberService {
     private val log = logger()
+    override fun userExistsInProject(userExistsInProjectModuleInput: UserExistsInProjectModuleInput): Mono<Boolean> {
+        val filters = projectMemberFilterResolver.resolve(
+            model = ProjectMemberFilterModel(
+                userId = userExistsInProjectModuleInput.userId,
+                projectId = userExistsInProjectModuleInput.projectId,
+            )
+        )
+
+        return memberRepository.existsMemberByFilters(filters)
+    }
+
 
     override fun connectMembers(connectMembers: ConnectMembersIn): Flux<ProjectMemberModel> {
         val projectId = connectMembers.projectId

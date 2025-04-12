@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.core.exception.ConflictException
+import via.easyflow.core.exception.NotFoundException
 import via.easyflow.core.tools.database.arguments.factory.IArgumentsHandlerFactory
 import via.easyflow.core.tools.database.query.builder.IQueryBuilder
 import via.easyflow.core.tools.database.query.filter.IQueryFilter
@@ -90,25 +91,28 @@ class TaskRepository(
         }
     }
 
-    override fun searchByFilter(filters: List<IQueryFilter>): Flux<TaskEntity> {
+    override fun searchByFilter(filters: List<IQueryFilter>, take: Long?): Flux<TaskEntity> {
+        val limit = take ?: 15
+
         val sql = """
             SELECT document FROM task WHERE ${queryBuilder.build(filters)}
         """.trimIndent()
 
         val specs: DatabaseClient.GenericExecuteSpec = client.sql(sql)
 
-        val specsMono: Mono<DatabaseClient.GenericExecuteSpec> = paramMapper.fill(
+        val specsMono: Mono<DatabaseClient.GenericExecuteSpec> = paramMapper.fillByFilters(
             filters,
             specs
         )
 
         val rows: Flux<MutableMap<String, Any>> = specsMono.flatMapMany {
             it.fetch().all()
-        }
+        }.take(limit)
+
 
         return rows.concatMap { row ->
             jsonRIO.fromJson(row["document"] as Json, TaskEntity::class)
-        }
+        }.switchIfEmpty(Mono.error(NotFoundException("Not found")))
     }
 
 

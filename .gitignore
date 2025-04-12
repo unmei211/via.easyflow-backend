@@ -12,7 +12,6 @@ classes/
 
 # Env vars
 env.yml
-env.local.yml
 !.env.template
 !.env.common
 

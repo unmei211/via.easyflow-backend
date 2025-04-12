@@ -12,9 +12,9 @@ import via.easyflow.modules.project.api.model.ProjectMemberViaRolesModel
 import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService
 
 @Controller
-class ProjectMemberController(
+class ProjectMemberModuleController(
     private val memberService: IProjectMemberService
-) : IProjectMemberController {
+) : IProjectMemberModuleController {
     private val log = logger()
     private fun validateConnectMembersToProject(connectMembersRequest: ConnectMembersViaRolesIn, projectId: String) {
         if (connectMembersRequest.projectId != projectId) throw ResponseStatusException(HttpStatus.BAD_REQUEST)

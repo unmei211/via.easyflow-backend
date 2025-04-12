@@ -11,9 +11,9 @@ import via.easyflow.modules.task.api.interaction.service.ITaskService
 import via.easyflow.modules.task.api.model.base.TaskModel
 
 @Controller
-class TaskController(
+class TaskModuleController(
     private val taskService: ITaskService
-) : ITaskController {
+) : ITaskModuleController {
     override fun addTask(taskIn: AddTasksIn): Mono<ResponseEntity<TaskModel>> {
         val tasks: Flux<TaskModel> = taskService.addTasks(taskIn)
         return tasks.single().map { task -> ResponseEntity.ok(task) }

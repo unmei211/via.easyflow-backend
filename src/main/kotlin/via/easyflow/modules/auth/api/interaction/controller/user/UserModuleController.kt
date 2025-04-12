@@ -12,9 +12,9 @@ import via.easyflow.modules.auth.api.contract.out.user.UpsertUserOut
 import via.easyflow.modules.auth.api.interaction.service.user.IUserService
 
 @Controller
-class UserController(
+class UserModuleController(
     private val userService: IUserService,
-) : IUserController {
+) : IUserModuleController {
     private val log = logger()
 
     override fun upsert(@RequestBody upsertIn: UpsertUserIn): Mono<ResponseEntity<UpsertUserOut>> {

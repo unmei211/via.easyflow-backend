@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import via.easyflow.core.api.out.exception.BadRequestExceptionOut
-import via.easyflow.core.api.out.exception.ConflictExceptionOut
-import via.easyflow.core.api.out.exception.NotFoundExceptionOut
+import via.easyflow.core.api.exception.BadRequestExceptionOut
+import via.easyflow.core.api.exception.ConflictExceptionOut
+import via.easyflow.core.api.exception.NotFoundExceptionOut
 import via.easyflow.core.exception.BadRequestException
 import via.easyflow.core.exception.ConflictException
 import via.easyflow.core.exception.NotFoundException

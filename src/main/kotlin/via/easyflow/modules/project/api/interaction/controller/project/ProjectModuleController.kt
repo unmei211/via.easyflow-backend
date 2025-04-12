@@ -10,9 +10,9 @@ import via.easyflow.modules.project.api.contract.`in`.project.UpsertProjectIn
 import via.easyflow.modules.project.api.model.ProjectModel
 
 @Controller
-class ProjectController(
+class ProjectModuleController(
     private val projectService: IProjectService
-) : IProjectController {
+) : IProjectModuleController {
     override fun upsertProject(projectRequest: UpsertProjectIn): Mono<ResponseEntity<ProjectDetailsModel>> {
         val projectOwnerPair = projectService.upsertProject(projectRequest)
         val response = projectOwnerPair.map {

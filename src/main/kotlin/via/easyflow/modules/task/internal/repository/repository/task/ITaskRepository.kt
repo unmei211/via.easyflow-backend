@@ -14,5 +14,5 @@ interface ITaskRepository {
 
     fun getById(monoTaskId: Mono<String>): Mono<TaskEntity>;
 
-    fun searchByFilter(filters: List<IQueryFilter>): Flux<TaskEntity>;
+    fun searchByFilter(filters: List<IQueryFilter>, take: Long? = 15): Flux<TaskEntity>;
 }

@@ -28,7 +28,7 @@ class R2dbcQueryParamMapper(
         }
     }
 
-    override fun fill(
+    override fun fillByFilters(
         filters: List<IQueryFilter>,
         clientBinder: DatabaseClient.GenericExecuteSpec
     ): Mono<DatabaseClient.GenericExecuteSpec> {
@@ -41,7 +41,7 @@ class R2dbcQueryParamMapper(
         }
     }
 
-    override fun fill(
+    override fun fillByParams(
         params: List<IQueryParam>,
         clientBinder: DatabaseClient.GenericExecuteSpec
     ): Mono<DatabaseClient.GenericExecuteSpec> {

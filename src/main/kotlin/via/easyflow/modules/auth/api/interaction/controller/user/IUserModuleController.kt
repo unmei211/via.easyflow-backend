@@ -9,8 +9,8 @@ import via.easyflow.modules.auth.api.contract.out.user.ExistsUserOut
 import via.easyflow.modules.auth.api.contract.out.user.UpsertUserOut
 
 @RestController
-@RequestMapping("/auth/user")
-interface IUserController {
+@RequestMapping("/module/auth/user")
+interface IUserModuleController {
     @PostMapping("/upsert")
     fun upsert(@RequestBody upsertIn: UpsertUserIn): Mono<ResponseEntity<UpsertUserOut>>
 

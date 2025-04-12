@@ -36,7 +36,7 @@ class TaskService(
     override fun addTasks(addTasksIn: AddTasksIn): Flux<TaskModel> {
         val tasksFlux = Flux.fromIterable(addTasksIn.tasks)
         val projectId = addTasksIn.projectId
-        val userId = addTasksIn.projectId
+        val userId = addTasksIn.ownerId
 
         return tasksFlux
             .map { taskView ->
@@ -63,11 +63,11 @@ class TaskService(
         val filters = userTaskFilterResolver.resolve(
             UserTaskFilterModel(
                 projectId = getTasksByUserIn.projectId,
-                userId = getTasksByUserIn.userId
+                ownerUserId = getTasksByUserIn.userId
             )
         )
 
-        return taskRepository.searchByFilter(filters)
+        return taskRepository.searchByFilter(filters, getTasksByUserIn.limit)
             .map { taskModel -> TaskModel.from(taskModel) }
     }
 
