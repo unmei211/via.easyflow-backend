@@ -4,10 +4,10 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.error
-import via.easyflow.core.exception.ConflictException
+import via.easyflow.shared.exceptions.exception.ConflictException
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService
-import via.easyflow.modules.project.api.interaction.service.member.UserExistsInProjectModuleInput
+import via.easyflow.shared.modules.project.api.service.IProjectMemberService
+import via.easyflow.shared.modules.project.api.service.UserExistsInProjectModuleInput
 
 @Component
 class UsersMustNotBeInProjectCase(

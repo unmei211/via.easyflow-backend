@@ -3,10 +3,10 @@ package via.easyflow.interactor.usecases.project
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.project.api.contract.`in`.project.UpsertProjectIn
-import via.easyflow.modules.project.api.interaction.service.project.IProjectService
-import via.easyflow.modules.project.api.model.ProjectModel
-import via.easyflow.modules.project.api.model.ProjectOwnerModel
+import via.easyflow.shared.modules.project.api.inputs.project.UpsertProjectIn
+import via.easyflow.shared.modules.project.api.service.IProjectService
+import via.easyflow.shared.modules.project.model.ProjectModel
+import via.easyflow.shared.modules.project.model.ProjectOwnerModel
 
 @Component
 class CreateProjectCase(

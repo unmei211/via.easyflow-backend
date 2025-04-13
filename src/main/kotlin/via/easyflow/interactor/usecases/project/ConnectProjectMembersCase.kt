@@ -2,11 +2,10 @@ package via.easyflow.interactor.usecases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
-import via.easyflow.core.exception.ConflictException
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
-import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService
-import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.shared.modules.project.api.inputs.member.ConnectMembersIn
+import via.easyflow.shared.modules.project.api.service.IProjectMemberService
+import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
 @Component
 class ConnectProjectMembersCase(

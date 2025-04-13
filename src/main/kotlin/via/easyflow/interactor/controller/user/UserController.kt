@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.user.IUserInteractor
 import via.easyflow.interactor.interactors.user.contract.UpsertUserInteractorInput
-import via.easyflow.modules.auth.api.model.user.UserModel
+import via.easyflow.shared.modules.auth.model.user.UserModel
 
 @Controller
 class UserController(

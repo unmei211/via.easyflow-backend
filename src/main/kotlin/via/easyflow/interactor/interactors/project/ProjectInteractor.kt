@@ -11,8 +11,8 @@ import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
 import via.easyflow.interactor.usecases.user.UsersMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UsersMustBeAvailableCaseInput
-import via.easyflow.modules.project.api.model.ProjectDetailsModel
-import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.shared.modules.project.model.ProjectDetailsModel
+import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
 @Component
 class ProjectInteractor(

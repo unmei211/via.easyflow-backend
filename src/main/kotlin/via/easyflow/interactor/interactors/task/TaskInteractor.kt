@@ -5,8 +5,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.error
 import reactor.core.publisher.Mono.just
-import via.easyflow.core.exception.ForbiddenException
-import via.easyflow.core.exception.NotFoundException
+import via.easyflow.shared.exceptions.exception.ForbiddenException
+import via.easyflow.shared.exceptions.exception.NotFoundException
 import via.easyflow.interactor.interactors.task.contract.AddTaskInteractorInput
 import via.easyflow.interactor.interactors.task.contract.AddUserTasksInProjectInteractorInput
 import via.easyflow.interactor.interactors.task.contract.ChangeTaskInteractorInput
@@ -18,7 +18,7 @@ import via.easyflow.interactor.usecases.user.UserIsAvailableCase
 import via.easyflow.interactor.usecases.user.UserIsAvailableUseCaseInput
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @Component
 class TaskInteractor(

@@ -7,7 +7,7 @@ import via.easyflow.interactor.controller.task.model.ChangeTaskRequestBody
 import via.easyflow.interactor.controller.task.model.TeamTaskAttribute
 import via.easyflow.interactor.interactors.task.ITaskInteractor
 import via.easyflow.interactor.interactors.task.contract.ChangeTaskInteractorInput
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @Controller
 class TeamTaskController(

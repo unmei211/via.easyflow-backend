@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.user.contract.UpsertUserInteractorInput
 import via.easyflow.interactor.usecases.user.UpsertUserCase
 import via.easyflow.interactor.usecases.user.UpsertUserCaseInput
-import via.easyflow.modules.auth.api.model.user.UserModel
+import via.easyflow.shared.modules.auth.model.user.UserModel
 
 @Component
 class UserInteractor(

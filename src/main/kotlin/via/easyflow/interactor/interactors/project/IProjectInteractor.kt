@@ -5,8 +5,8 @@ import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
 import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
-import via.easyflow.modules.project.api.model.ProjectDetailsModel
-import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.shared.modules.project.model.ProjectDetailsModel
+import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
 interface IProjectInteractor {
     fun createProject(input: CreateProjectInteractorInput): Mono<ProjectDetailsModel>

@@ -2,12 +2,12 @@ package via.easyflow.interactor.usecases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import via.easyflow.core.exception.ForbiddenException
+import via.easyflow.shared.exceptions.exception.ForbiddenException
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService
-import via.easyflow.modules.project.api.interaction.service.member.UserExistsInProjectModuleInput
-import via.easyflow.modules.project.api.interaction.service.project.IProjectService
-import via.easyflow.modules.project.api.interaction.service.role.IProjectRoleService
+import via.easyflow.shared.modules.project.api.service.IProjectMemberService
+import via.easyflow.shared.modules.project.api.service.UserExistsInProjectModuleInput
+import via.easyflow.shared.modules.project.api.service.IProjectService
+import via.easyflow.shared.modules.project.api.service.IProjectRoleService
 
 @Component
 class ProjectMustBeAvailableForUserCase(

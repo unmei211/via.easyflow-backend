@@ -6,10 +6,9 @@ import via.easyflow.core.layer.LayerType
 import via.easyflow.core.layer.converter.function.cv
 import via.easyflow.core.layer.factory.ILayerConverterFactory
 import via.easyflow.core.layer.manager.HashLayerConverterManager
-import via.easyflow.modules.project.api.model.ProjectMemberModel
-import via.easyflow.modules.project.api.model.ProjectModel
-import via.easyflow.modules.project.internal.entity.ProjectEntity
-import via.easyflow.modules.project.internal.entity.ProjectMemberEntity
+import via.easyflow.shared.modules.project.model.ProjectMemberModel
+import via.easyflow.shared.modules.project.model.ProjectModel
+import via.easyflow.modules.project.repository.member.model.ProjectMemberEntity
 
 @Configuration
 class ProjectLayerConfiguration(
@@ -28,7 +27,7 @@ class ProjectLayerConfiguration(
                         joinedAt = from.joinedAt,
                     )
                 },
-                cv { from: ProjectEntity ->
+                cv { from: via.easyflow.modules.project.repository.project.model.ProjectEntity ->
                     ProjectModel(
                         projectId = from.projectId,
                         name = from.name,
@@ -37,7 +36,7 @@ class ProjectLayerConfiguration(
                     )
                 },
                 cv { from: ProjectModel ->
-                    ProjectEntity(
+                    via.easyflow.modules.project.repository.project.model.ProjectEntity(
                         projectId = from.projectId!!,
                         name = from.name,
                         description = from.description,

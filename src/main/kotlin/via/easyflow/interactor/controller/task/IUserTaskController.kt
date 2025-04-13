@@ -7,9 +7,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.controller.task.model.AddTaskRequestBody
 import via.easyflow.interactor.controller.task.model.BaseTasksRequestsAttribute
-import via.easyflow.interactor.controller.task.model.ChangeTaskRequestBody
-import via.easyflow.interactor.controller.task.model.ExtendedTasksRequestsAttribute
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @RestController
 @RequestMapping(

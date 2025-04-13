@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.task.contract.AddTaskInteractorInput
 import via.easyflow.interactor.interactors.task.contract.AddUserTasksInProjectInteractorInput
 import via.easyflow.interactor.interactors.task.contract.ChangeTaskInteractorInput
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.model.TaskModel
 
 interface ITaskInteractor {
     fun addTask(input: AddTaskInteractorInput): Mono<TaskModel>

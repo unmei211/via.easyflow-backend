@@ -6,12 +6,10 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.controller.task.model.AddTaskRequestBody
 import via.easyflow.interactor.controller.task.model.BaseTasksRequestsAttribute
-import via.easyflow.interactor.controller.task.model.ChangeTaskRequestBody
-import via.easyflow.interactor.controller.task.model.ExtendedTasksRequestsAttribute
 import via.easyflow.interactor.interactors.task.ITaskInteractor
 import via.easyflow.interactor.interactors.task.contract.AddTaskInteractorInput
 import via.easyflow.interactor.interactors.task.contract.AddUserTasksInProjectInteractorInput
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @Controller
 class UserTaskController(

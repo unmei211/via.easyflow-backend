@@ -1,8 +1,8 @@
 package via.easyflow.core.tools.version.comparator
 
 import org.springframework.stereotype.Component
-import via.easyflow.core.exception.BadRequestException
-import via.easyflow.core.exception.ConflictException
+import via.easyflow.shared.exceptions.exception.BadRequestException
+import via.easyflow.shared.exceptions.exception.ConflictException
 import java.sql.Timestamp
 
 @Component

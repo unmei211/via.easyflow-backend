@@ -3,10 +3,10 @@ package via.easyflow.interactor.usecases.task
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.task.api.contract.`in`.ChangeTaskIn
-import via.easyflow.modules.task.api.contract.`in`.view.ChangeTaskView
-import via.easyflow.modules.task.api.interaction.service.ITaskService
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.api.inputs.ChangeTaskIn
+import via.easyflow.shared.modules.task.api.inputs.view.ChangeTaskView
+import via.easyflow.shared.modules.task.api.service.ITaskService
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @Component
 class ChangeTaskCase(

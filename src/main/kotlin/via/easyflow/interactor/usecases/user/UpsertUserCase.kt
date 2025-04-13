@@ -3,9 +3,9 @@ package via.easyflow.interactor.usecases.user
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.auth.api.contract.`in`.user.UpsertUserIn
-import via.easyflow.modules.auth.api.interaction.service.user.IUserService
-import via.easyflow.modules.auth.api.model.user.UserModel
+import via.easyflow.shared.modules.auth.api.inputs.user.UpsertUserIn
+import via.easyflow.shared.modules.auth.api.service.IUserService
+import via.easyflow.shared.modules.auth.model.user.UserModel
 
 @Component
 class UpsertUserCase(

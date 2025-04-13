@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
-import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
-import via.easyflow.modules.project.api.model.ProjectDetailsModel
-import via.easyflow.modules.project.api.model.ProjectMemberModel
+import via.easyflow.shared.modules.project.api.inputs.member.ConnectMembersIn
+import via.easyflow.shared.modules.project.model.ProjectDetailsModel
+import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
 
 @RestController

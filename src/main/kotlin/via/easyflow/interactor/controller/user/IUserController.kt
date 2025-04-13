@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.user.contract.UpsertUserInteractorInput
-import via.easyflow.modules.auth.api.model.user.UserModel
+import via.easyflow.shared.modules.auth.model.user.UserModel
 
 @RestController
 @RequestMapping("/interactor/auth/user", produces = [MediaType.APPLICATION_NDJSON_VALUE])

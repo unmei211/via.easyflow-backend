@@ -2,12 +2,12 @@ package via.easyflow.interactor.usecases.task
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import via.easyflow.core.exception.NotFoundException
+import via.easyflow.shared.exceptions.exception.NotFoundException
 import via.easyflow.interactor.usecases.UseCase
-import via.easyflow.modules.task.api.contract.`in`.AddTasksIn
-import via.easyflow.modules.task.api.contract.`in`.view.CreateTaskView
-import via.easyflow.modules.task.api.interaction.service.ITaskService
-import via.easyflow.modules.task.api.model.base.TaskModel
+import via.easyflow.shared.modules.task.api.inputs.AddTasksIn
+import via.easyflow.shared.modules.task.api.inputs.view.CreateTaskView
+import via.easyflow.shared.modules.task.api.service.ITaskService
+import via.easyflow.shared.modules.task.model.TaskModel
 
 @Component
 class AddTaskCase(
