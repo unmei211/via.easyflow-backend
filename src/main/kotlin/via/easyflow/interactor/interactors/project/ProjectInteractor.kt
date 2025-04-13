@@ -5,6 +5,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
+import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
 import via.easyflow.interactor.usecases.project.*
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
@@ -22,7 +23,33 @@ class ProjectInteractor(
     private val createProjectCase: CreateProjectCase,
     private val connectOwnerToProjectCase: ConnectOwnerToProjectCase,
     private val connectProjectMembersCase: ConnectProjectMembersCase,
+    private val getProjectMembersCase: GetProjectMembersCase,
+    private val projectMustBeAvailableForUserCase: ProjectMustBeAvailableForUserCase
 ) : IProjectInteractor {
+    override fun getProjectMembers(input: GetProjectMembersInteractorInput): Flux<ProjectMemberModel> {
+        val userAvailableValidated = usersMustBeAvailableCase.invoke(
+            UsersMustBeAvailableCaseInput(
+                userIds = listOf(input.userId),
+            )
+        )
+
+        val projectAvailableForUserValidated = projectMustBeAvailableForUserCase.invoke(
+            input = ProjectIsAvailableForUserCaseInput(
+                userId = input.userId,
+                projectId = input.projectId
+            )
+        )
+
+        return userAvailableValidated.zipWith(projectAvailableForUserValidated)
+            .thenMany(
+                getProjectMembersCase.invoke(
+                    GetProjectMembersCaseInput(
+                        projectId = input.projectId
+                    )
+                )
+            )
+    }
+
     override fun connectMembers(input: ConnectProjectMembersInteractorInput): Flux<ProjectMemberModel> {
         val usersToProjectValidated = usersMustNotBeInProjectCase.invoke(
             input = UsersNotInProjectCaseInput(

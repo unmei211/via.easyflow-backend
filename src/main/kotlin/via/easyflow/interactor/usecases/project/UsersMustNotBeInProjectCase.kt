@@ -3,6 +3,7 @@ package via.easyflow.interactor.usecases.project
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Mono.error
 import via.easyflow.core.exception.ConflictException
 import via.easyflow.interactor.usecases.UseCase
 import via.easyflow.modules.project.api.interaction.service.member.IProjectMemberService

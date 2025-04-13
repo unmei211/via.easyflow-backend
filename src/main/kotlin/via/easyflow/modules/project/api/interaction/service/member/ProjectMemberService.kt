@@ -11,6 +11,7 @@ import via.easyflow.core.tools.logger.logger
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersViaRolesIn
+import via.easyflow.modules.project.api.contract.`in`.member.GetProjectMembersModuleIn
 import via.easyflow.modules.project.api.interaction.service.filter.model.ProjectMemberFilterModel
 import via.easyflow.modules.project.api.model.ProjectMemberModel
 import via.easyflow.modules.project.api.model.ProjectMemberRoleModel
@@ -33,6 +34,17 @@ class ProjectMemberService(
     private val projectMemberFilterResolver: IQueryFiltersResolver<ProjectMemberFilterModel>
 ) : IProjectMemberService {
     private val log = logger()
+    override fun getProjectMembers(input: GetProjectMembersModuleIn): Flux<ProjectMemberModel> {
+        val filters = projectMemberFilterResolver.resolve(
+            model = ProjectMemberFilterModel(
+                projectId = input.projectId,
+            )
+        )
+
+        return memberRepository.searchByFilter(filters)
+            .map { cv.modelToEntity(it to ProjectMemberModel::class) }
+    }
+
     override fun userExistsInProject(userExistsInProjectModuleInput: UserExistsInProjectModuleInput): Mono<Boolean> {
         val filters = projectMemberFilterResolver.resolve(
             model = ProjectMemberFilterModel(

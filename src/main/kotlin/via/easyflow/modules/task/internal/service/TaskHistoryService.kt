@@ -28,6 +28,7 @@ class TaskHistoryService(
                 projectId = task.projectId,
                 version = task.version,
                 moveAt = Instant.now(),
+                changerId = taskIn.changerId,
             )
         )
         return taskHistoryEntity

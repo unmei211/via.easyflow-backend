@@ -13,4 +13,6 @@ interface IMemberRepository {
     fun grantRolesToMember(grantEnquiry: GrantRolesToMemberEnquiry): Flux<ProjectMemberRoleEntity>;
 
     fun existsMemberByFilters(filters: List<IQueryFilter>): Mono<Boolean>;
+
+    fun searchByFilter(filters: List<IQueryFilter>): Flux<ProjectMemberEntity>;
 }

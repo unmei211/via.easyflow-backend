@@ -24,4 +24,10 @@ interface IProjectController {
     @PostMapping("/upsert")
     fun upsertProject(@RequestBody input: CreateProjectInteractorInput): Mono<
             ResponseEntity<Mono<ProjectDetailsModel>>>
+
+    @GetMapping("/{projectId}/members")
+    fun getProjectMembers(
+        @PathVariable projectId: String,
+        @RequestParam(required = true) userId: String
+    ): Mono<ResponseEntity<Flux<ProjectMemberModel>>>
 }

@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import via.easyflow.core.api.exception.BadRequestExceptionOut
 import via.easyflow.core.api.exception.ConflictExceptionOut
+import via.easyflow.core.api.exception.ForbiddenExceptionOut
 import via.easyflow.core.api.exception.NotFoundExceptionOut
 import via.easyflow.core.exception.BadRequestException
 import via.easyflow.core.exception.ConflictException
+import via.easyflow.core.exception.ForbiddenException
 import via.easyflow.core.exception.NotFoundException
 import via.easyflow.core.tools.logger.logger
 
@@ -17,6 +19,15 @@ import via.easyflow.core.tools.logger.logger
 class ExceptionHandler {
     private val log = logger()
 
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleDataAccessException(ex: ForbiddenException): ResponseEntity<ForbiddenExceptionOut> {
+        log.error(ex.message, ex)
+        return ResponseEntity(
+            ForbiddenExceptionOut(ex.errors, ex.message ?: ""),
+            HttpStatus.FORBIDDEN
+        )
+    }
 
     @ExceptionHandler(NotFoundException::class)
     fun handleDataAccessException(ex: NotFoundException): ResponseEntity<NotFoundExceptionOut> {

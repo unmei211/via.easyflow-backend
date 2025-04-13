@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.project.IProjectInteractor
 import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
+import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
 import via.easyflow.modules.project.api.contract.`in`.member.ConnectMembersIn
 import via.easyflow.modules.project.api.model.ProjectDetailsModel
 import via.easyflow.modules.project.api.model.ProjectMemberModel
@@ -15,6 +16,19 @@ import via.easyflow.modules.project.api.model.ProjectMemberModel
 class ProjectController(
     private val projectInteractor: IProjectInteractor
 ) : IProjectController {
+    override fun getProjectMembers(projectId: String, userId: String): Mono<ResponseEntity<Flux<ProjectMemberModel>>> {
+        return Mono.just(
+            ResponseEntity.ok(
+                projectInteractor.getProjectMembers(
+                    input = GetProjectMembersInteractorInput(
+                        projectId = projectId,
+                        userId = userId
+                    )
+                )
+            )
+        )
+    }
+
     override fun connectMembersToProject(
         connectMembersRequest: ConnectMembersIn,
         projectId: String

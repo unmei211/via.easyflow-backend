@@ -11,6 +11,7 @@ data class TaskHistoryEntity(
     val createdAt: Instant,
     val updatedAt: Instant?,
     val ownerUserId: String,
+    val changerId: String,
     val projectId: String,
     val version: String,
     val moveAt: Instant

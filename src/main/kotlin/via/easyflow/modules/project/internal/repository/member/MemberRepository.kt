@@ -1,11 +1,13 @@
 package via.easyflow.modules.project.internal.repository.member
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.r2dbc.postgresql.codec.Json
 import io.r2dbc.spi.ConnectionFactory
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import via.easyflow.core.exception.NotFoundException
 import via.easyflow.core.tools.database.query.builder.IQueryBuilder
 import via.easyflow.core.tools.database.query.filter.IQueryFilter
 import via.easyflow.core.tools.database.query.param.filler.IQueryParamMapper
@@ -26,6 +28,27 @@ class MemberRepository(
     private val paramMapper: IQueryParamMapper<DatabaseClient.GenericExecuteSpec, Mono<DatabaseClient.GenericExecuteSpec>>
 ) : IMemberRepository {
     private val log = logger()
+    override fun searchByFilter(filters: List<IQueryFilter>): Flux<ProjectMemberEntity> {
+        val sql = """
+            SELECT document FROM project_member WHERE ${queryBuilder.build(filters)}
+        """.trimIndent()
+
+        val specs: DatabaseClient.GenericExecuteSpec = client.sql(sql)
+
+        val specsMono: Mono<DatabaseClient.GenericExecuteSpec> = paramMapper.fillByFilters(
+            filters,
+            specs
+        )
+
+        val rows: Flux<MutableMap<String, Any>> = specsMono.flatMapMany {
+            it.fetch().all()
+        }
+
+
+        return rows.concatMap { row ->
+            jsonRIO.fromJson(row["document"] as Json, ProjectMemberEntity::class)
+        }.switchIfEmpty(Mono.error(NotFoundException("Not found")))
+    }
 
     override fun existsMemberByFilters(filters: List<IQueryFilter>): Mono<Boolean> {
         val sql = """

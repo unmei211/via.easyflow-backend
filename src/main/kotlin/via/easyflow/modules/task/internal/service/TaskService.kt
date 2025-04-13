@@ -108,9 +108,14 @@ class TaskService(
                     .map { prev to it }
             }
             .flatMap { (prev, updated) ->
-                taskHistoryService.writeTaskHistory(WriteTaskHistoryIn(task = prev))
+                taskHistoryService.writeTaskHistory(
+                    WriteTaskHistoryIn(
+                        task = prev,
+                        changerId = changeTaskIn.changerId,
+                    )
+                )
                     .map { prev to updated }
             }
-            .map { (prev, updated) -> TaskModel.from(updated) }
+            .map { (_, updated) -> TaskModel.from(updated) }
     }
 }
