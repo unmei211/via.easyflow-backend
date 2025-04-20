@@ -6,7 +6,18 @@ import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
 import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
-import via.easyflow.interactor.usecases.project.*
+import via.easyflow.interactor.usecases.project.ConnectOwnerToProjectCase
+import via.easyflow.interactor.usecases.project.ConnectOwnerToProjectCaseInput
+import via.easyflow.interactor.usecases.project.ConnectProjectMembersCase
+import via.easyflow.interactor.usecases.project.ConnectProjectMembersCaseInput
+import via.easyflow.interactor.usecases.project.CreateProjectCase
+import via.easyflow.interactor.usecases.project.CreateProjectCaseInput
+import via.easyflow.interactor.usecases.project.GetProjectMembersCase
+import via.easyflow.interactor.usecases.project.GetProjectMembersCaseInput
+import via.easyflow.interactor.usecases.project.ProjectMustBeAvailableForUserCase
+import via.easyflow.interactor.usecases.project.ProjectMustBeAvailableForUserCaseInput
+import via.easyflow.interactor.usecases.project.UsersMustNotBeInProjectCase
+import via.easyflow.interactor.usecases.project.UsersNotInProjectCaseInput
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
 import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
 import via.easyflow.interactor.usecases.user.UsersMustBeAvailableCase
@@ -34,7 +45,7 @@ class ProjectInteractor(
         )
 
         val projectAvailableForUserValidated = projectMustBeAvailableForUserCase.invoke(
-            input = ProjectIsAvailableForUserCaseInput(
+            input = ProjectMustBeAvailableForUserCaseInput(
                 userId = input.userId,
                 projectId = input.projectId
             )

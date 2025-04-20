@@ -14,8 +14,8 @@ class ProjectMustBeAvailableForUserCase(
     private val projectService: IProjectService,
     private val projectMemberService: IProjectMemberService,
     private val projectRoleService: IProjectRoleService,
-) : UseCase<ProjectIsAvailableForUserCaseInput, Mono<Boolean>> {
-    override fun invoke(input: ProjectIsAvailableForUserCaseInput): Mono<Boolean> {
+) : UseCase<ProjectMustBeAvailableForUserCaseInput, Mono<Boolean>> {
+    override fun invoke(input: ProjectMustBeAvailableForUserCaseInput): Mono<Boolean> {
         val existsMono = projectMemberService.userExistsInProject(
             UserExistsInProjectModuleInput(
                 userId = input.userId,

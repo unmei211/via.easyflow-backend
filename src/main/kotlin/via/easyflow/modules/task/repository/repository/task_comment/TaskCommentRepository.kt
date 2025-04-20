@@ -17,13 +17,15 @@ class TaskCommentRepository(
 ) : ITaskCommentRepository {
     override fun add(taskComment: TaskCommentEntity): Mono<TaskCommentEntity> {
         val sql = """
-            INSERT INTO task_comment(document) VALUES (:comment::jsonb)
+            INSERT INTO task_comment(document) VALUES (:document::jsonb)
         """.trimIndent()
 
         return paramMapper.fillByPairs(
-            "comment" to taskComment,
+            "document" to taskComment,
             clientBinder = client.sql(sql)
-        ).then(Mono.just(taskComment))
+        )
+            .flatMap { it.then() }
+            .then(Mono.just(taskComment))
     }
 
     override fun update(taskComment: TaskCommentEntity): Mono<TaskCommentEntity> {
