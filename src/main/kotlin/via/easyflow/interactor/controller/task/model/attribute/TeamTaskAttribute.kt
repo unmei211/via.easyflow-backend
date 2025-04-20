@@ -1,4 +1,4 @@
-package via.easyflow.interactor.controller.task.model
+package via.easyflow.interactor.controller.task.model.attribute
 
 data class TeamTaskAttribute(
     val projectId: String,

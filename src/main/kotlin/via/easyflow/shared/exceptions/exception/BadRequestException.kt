@@ -1,8 +1,5 @@
 package via.easyflow.shared.exceptions.exception
 
-import org.springframework.modulith.NamedInterface
-
-@NamedInterface
 class BadRequestException(
     message: String,
     cause: Throwable? = null,

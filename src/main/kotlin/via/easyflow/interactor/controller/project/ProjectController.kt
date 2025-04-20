@@ -4,11 +4,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import via.easyflow.interactor.controller.project.model.ConnectMembersRequestBody
 import via.easyflow.interactor.interactors.project.IProjectInteractor
 import via.easyflow.interactor.interactors.project.contract.ConnectProjectMembersInteractorInput
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
 import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
-import via.easyflow.shared.modules.project.api.inputs.member.ConnectMembersIn
 import via.easyflow.shared.modules.project.model.ProjectDetailsModel
 import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
@@ -30,7 +30,7 @@ class ProjectController(
     }
 
     override fun connectMembersToProject(
-        connectMembersRequest: ConnectMembersIn,
+        connectMembersRequest: ConnectMembersRequestBody,
         projectId: String
     ): Mono<ResponseEntity<Flux<ProjectMemberModel>>> {
         return Mono.just(

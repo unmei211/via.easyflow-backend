@@ -1,8 +1,6 @@
 package via.easyflow.shared.exceptions.exception
 
-import org.springframework.modulith.NamedInterface
 
-@NamedInterface
 class ConflictException(
     message: String,
     cause: Throwable? = null,

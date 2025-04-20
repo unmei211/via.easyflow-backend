@@ -7,11 +7,22 @@ import via.easyflow.core.tools.database.arguments.factory.IArgumentsHandlerFacto
 import via.easyflow.core.tools.database.arguments.handler.IArgumentsHandler
 import via.easyflow.core.tools.database.query.filter.IQueryFilter
 import via.easyflow.core.tools.database.query.param.IQueryParam
+import via.easyflow.core.tools.database.query.param.SimpleQueryParam
 
 @Component
 class R2dbcQueryParamMapper(
     private val argsFactory: IArgumentsHandlerFactory
 ) : IQueryParamMapper<DatabaseClient.GenericExecuteSpec, Mono<DatabaseClient.GenericExecuteSpec>> {
+    override fun fillByPairs(
+        vararg pairs: Pair<String, Any>,
+        clientBinder: DatabaseClient.GenericExecuteSpec
+    ): Mono<DatabaseClient.GenericExecuteSpec> {
+        return this.fill(clientBinder) {
+            pairs.map { (key, value) ->
+                SimpleQueryParam(value, key)
+            }
+        }
+    }
 
     private fun fill(
         clientBinder: DatabaseClient.GenericExecuteSpec,

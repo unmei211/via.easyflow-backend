@@ -1,22 +1,27 @@
 package via.easyflow.modules.task.service
 
+import java.sql.Timestamp
+import java.time.Instant
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import via.easyflow.shared.exceptions.exception.NotFoundException
 import via.easyflow.core.tools.database.query.resolver.IQueryFiltersResolver
 import via.easyflow.core.tools.uuid.uuid
 import via.easyflow.core.tools.version.comparator.IVersionComparator
 import via.easyflow.core.tools.version.versionizer.IVersionizer
 import via.easyflow.modules.task.repository.contract.UpdateTaskMutation
 import via.easyflow.modules.task.repository.repository.task.ITaskRepository
+import via.easyflow.modules.task.service.user_task.model.UserTaskFilterModel
+import via.easyflow.shared.exceptions.exception.NotFoundException
+import via.easyflow.shared.modules.task.api.inputs.AddTasksIn
+import via.easyflow.shared.modules.task.api.inputs.ChangeTaskIn
+import via.easyflow.shared.modules.task.api.inputs.GetTaskByIdIn
+import via.easyflow.shared.modules.task.api.inputs.GetTasksByProjectIn
+import via.easyflow.shared.modules.task.api.inputs.GetTasksByUserIn
+import via.easyflow.shared.modules.task.api.inputs.WriteTaskHistoryIn
 import via.easyflow.shared.modules.task.api.service.ITaskHistoryService
 import via.easyflow.shared.modules.task.api.service.ITaskService
 import via.easyflow.shared.modules.task.model.TaskModel
-import via.easyflow.modules.task.service.user_task.model.UserTaskFilterModel
-import via.easyflow.shared.modules.task.api.inputs.*
-import java.sql.Timestamp
-import java.time.Instant
 
 @Service
 class TaskService(
@@ -71,8 +76,14 @@ class TaskService(
             .map { taskModel -> TaskModel.from(taskModel) }
     }
 
-    override fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn) {
-        TODO("Not yet implemented")
+    override fun getTasksByProject(getTasksByProjectIn: GetTasksByProjectIn): Flux<TaskModel> {
+        val filters = userTaskFilterResolver.resolve(
+            UserTaskFilterModel(
+                projectId = getTasksByProjectIn.projectId,
+            ),
+        )
+
+        return taskRepository.searchByFilter(filters).map { taskEntity -> TaskModel.from(taskEntity) }
     }
 
     override fun changeTask(changeTaskIn: ChangeTaskIn): Mono<TaskModel> {
