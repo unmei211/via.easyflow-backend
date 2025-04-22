@@ -1,10 +1,12 @@
 package via.easyflow.modules.task.service
 
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import via.easyflow.modules.task.repository.model.TaskCommentEntity
 import via.easyflow.modules.task.repository.repository.task_comment.ITaskCommentRepository
 import via.easyflow.shared.modules.task.api.inputs.GetTaskByIdIn
+import via.easyflow.shared.modules.task.api.inputs.GetTaskCommentsIn
 import via.easyflow.shared.modules.task.api.inputs.task_comment.PushTaskCommentIn
 import via.easyflow.shared.modules.task.api.service.ITaskCommentService
 import via.easyflow.shared.modules.task.api.service.ITaskService
@@ -15,6 +17,10 @@ class TaskCommentService(
     private val taskCommentRepository: ITaskCommentRepository,
     private val taskService: ITaskService,
 ) : ITaskCommentService {
+    override fun getTaskComments(input: GetTaskCommentsIn): Flux<TaskCommentModel> {
+        TODO("Not yet implemented")
+    }
+
     override fun pushTaskComment(input: PushTaskCommentIn): Mono<TaskCommentModel> {
         val taskMono = taskService.getTaskById(GetTaskByIdIn(input.taskId))
 

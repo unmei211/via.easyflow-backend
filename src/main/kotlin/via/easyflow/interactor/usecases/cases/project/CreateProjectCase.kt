@@ -1,4 +1,4 @@
-package via.easyflow.interactor.usecases.project
+package via.easyflow.interactor.usecases.cases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono

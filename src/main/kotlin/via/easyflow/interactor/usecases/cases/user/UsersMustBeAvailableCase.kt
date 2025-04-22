@@ -1,4 +1,4 @@
-package via.easyflow.interactor.usecases.user
+package via.easyflow.interactor.usecases.cases.user
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux

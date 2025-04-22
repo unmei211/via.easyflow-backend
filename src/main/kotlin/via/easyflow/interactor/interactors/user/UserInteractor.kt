@@ -3,13 +3,15 @@ package via.easyflow.interactor.interactors.user
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import via.easyflow.interactor.interactors.user.contract.UpsertUserInteractorInput
-import via.easyflow.interactor.usecases.user.UpsertUserCase
-import via.easyflow.interactor.usecases.user.UpsertUserCaseInput
+import via.easyflow.interactor.usecases.cases.user.UpsertUserCase
+import via.easyflow.interactor.usecases.cases.user.UpsertUserCaseInput
+import via.easyflow.interactor.usecases.manager.IUseCaseManager
 import via.easyflow.shared.modules.auth.model.user.UserModel
 
 @Component
 class UserInteractor(
     private val upsertUserCase: UpsertUserCase,
+    private val userUserCaseManager: IUseCaseManager
 ) : IUserInteractor {
     override fun upsertUser(input: UpsertUserInteractorInput): Mono<UserModel> {
         return upsertUserCase.invoke(
