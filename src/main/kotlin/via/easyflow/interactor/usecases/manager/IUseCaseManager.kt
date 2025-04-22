@@ -1,9 +1,8 @@
 package via.easyflow.interactor.usecases.manager
 
-import reactor.core.publisher.Mono
-import via.easyflow.interactor.usecases.UseCase
-import kotlin.reflect.KClass
+import via.easyflow.interactor.usecases.TypedUseCase
 
 interface IUseCaseManager {
-    fun <T, R> invoke(input: T): R
+    fun <T : Any, R> invoke(input: T): R
+    fun <T : Any, R : Any> get(input: T): TypedUseCase<T, R>?
 }

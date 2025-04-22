@@ -14,6 +14,12 @@ class UserInteractor(
     private val userUserCaseManager: IUseCaseManager
 ) : IUserInteractor {
     override fun upsertUser(input: UpsertUserInteractorInput): Mono<UserModel> {
+        val result: Mono<Unit> = userUserCaseManager.invoke<UpsertUserCaseInput, Mono<Unit>>(
+            input = UpsertUserCaseInput(
+                userId = input.userId,
+                name = input.name,
+            )
+        )
         return upsertUserCase.invoke(
             input = UpsertUserCaseInput(
                 userId = input.userId,
