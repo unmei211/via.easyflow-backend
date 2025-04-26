@@ -1,11 +1,15 @@
 package via.easyflow.interactor.usecases.manager.user
 
+import org.springframework.stereotype.Component
 import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.annotation.Case
+import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.interactor.usecases.manager.IUseCaseManager
 import kotlin.reflect.KClass
 
+@Component
 class UserUseCaseManager(
-    private val usecasesMap: Map<KClass<*>, TypedUseCase<*, *>>
+    @Case(scope = CaseScope.USER) private val usecasesMap: Map<KClass<*>, TypedUseCase<*, *>>
 ) : IUseCaseManager {
     private val useCasesByInputType = usecasesMap
 

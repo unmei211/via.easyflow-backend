@@ -5,6 +5,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
 @Qualifier
-annotation class UseCase(
+annotation class Case(
     val scope: String
 )

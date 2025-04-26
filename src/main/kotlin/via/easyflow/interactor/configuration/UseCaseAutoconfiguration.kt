@@ -1,34 +1,54 @@
 package via.easyflow.interactor.configuration
 
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.beans.factory.support.AutowireCandidateQualifier
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor
+import org.springframework.beans.factory.support.DefaultListableBeanFactory
+import org.springframework.beans.factory.support.GenericBeanDefinition
 import org.springframework.context.annotation.Configuration
 import via.easyflow.interactor.usecases.TypedUseCase
-import via.easyflow.interactor.usecases.annotation.UseCase
-import kotlin.reflect.KClass
+import via.easyflow.interactor.usecases.annotation.Case
 
 @Configuration
-class UseCaseAutoConfiguration : BeanFactoryPostProcessor {
+class UseCaseAutoConfiguration : BeanDefinitionRegistryPostProcessor {
 
-    override fun postProcessBeanFactory(beanFactory: ConfigurableListableBeanFactory) {
-        val beans = beanFactory.getBeansWithAnnotation(UseCase::class.java)
 
-        val scopedBeans = beans.values.groupBy {
-            it.javaClass.getAnnotation(UseCase::class.java).scope
+    override fun postProcessBeanDefinitionRegistry(registry: BeanDefinitionRegistry) {
+        val beanFactory = registry as? DefaultListableBeanFactory
+            ?: throw IllegalArgumentException("Bean factory must be a DefaultListableBeanFactory")
+
+        val useCaseBeanDefinitions = beanFactory.getBeanNamesForType(TypedUseCase::class.java)
+
+        val scopeGroups = mutableMapOf<String, MutableList<String>>()
+
+        useCaseBeanDefinitions.forEach { beanName ->
+            val beanDefinition = beanFactory.getBeanDefinition(beanName)
+            val className = beanDefinition.beanClassName
+
+            val clazz = Class.forName(className)
+
+            if (TypedUseCase::class.java.isAssignableFrom(clazz) && clazz.isAnnotationPresent(Case::class.java)) {
+                val case = clazz.getAnnotation(Case::class.java)
+                scopeGroups.computeIfAbsent(case.scope) { mutableListOf() }.add(beanName)
+            }
         }
 
-        scopedBeans.forEach { (scope, useCases) ->
-            val mapBeanName = "${scope.lowercase()}ScopedInputs"
-            val mapBeanDefinition = createMapBeanDefinition(useCases)
+        scopeGroups.forEach { (scopeName, groups) ->
+            val scopedUseCases = "$scopeName-UseCaseInputType"
 
-            beanFactory.registerSingleton(mapBeanName, mapBeanDefinition)
+            if (!registry.containsBeanDefinition(scopedUseCases)) {
+                val qualifier = AutowireCandidateQualifier(Case::class.java)
+                qualifier.setAttribute("scope", scopeName)
+
+                val beanDef = GenericBeanDefinition().apply {
+                    setBeanClass(Map::class.java)
+                    factoryBeanName = "useCasesInputFactory"
+                    factoryMethodName = "createMapBeanDefinition"
+                    constructorArgumentValues.addGenericArgumentValue(groups)
+                    addQualifier(qualifier)
+                }
+                registry.registerBeanDefinition(scopedUseCases, beanDef)
+            }
         }
-    }
-
-    private fun createMapBeanDefinition(useCases: List<Any>): Map<KClass<*>, TypedUseCase<*, *>> {
-        return useCases.associateBy(
-            keySelector = { it::class },
-            valueTransform = { it as TypedUseCase<*, *> }
-        )
     }
 }
