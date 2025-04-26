@@ -1,18 +1,26 @@
-package via.easyflow.interactor.usecases.project
+package via.easyflow.interactor.usecases.cases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import via.easyflow.interactor.usecases.UseCase
+import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.annotation.Case
+import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.modules.project.api.inputs.project.UpsertProjectIn
 import via.easyflow.shared.modules.project.api.service.IProjectService
 import via.easyflow.shared.modules.project.model.ProjectModel
 import via.easyflow.shared.modules.project.model.ProjectOwnerModel
+import kotlin.reflect.KClass
 
 @Component
+@Case(CaseScope.PROJECT)
 class CreateProjectCase(
     private val projectService: IProjectService,
-) : UseCase<CreateProjectCaseInput, Mono<Pair<ProjectModel, ProjectOwnerModel>>> {
-    override fun invoke(input: CreateProjectCaseInput): Mono<Pair<ProjectModel, ProjectOwnerModel>> {
+) : TypedUseCase<CreateProjectCase.Input, Mono<Pair<ProjectModel, ProjectOwnerModel>>> {
+    override fun getInputType(): KClass<Input> {
+        return Input::class
+    }
+
+    override fun invoke(input: Input): Mono<Pair<ProjectModel, ProjectOwnerModel>> {
         val result: Mono<Pair<ProjectModel, ProjectOwnerModel>> = projectService.upsertProject(
             upsertRequest = UpsertProjectIn(
                 project = ProjectModel(
@@ -24,11 +32,10 @@ class CreateProjectCase(
         )
         return result
     }
+
+    data class Input(
+        val ownerId: String,
+        val projectName: String,
+        val projectDescription: String
+    )
 }
-
-
-data class CreateProjectCaseInput(
-    val ownerId: String,
-    val projectName: String,
-    val projectDescription: String
-)

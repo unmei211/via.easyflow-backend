@@ -1,0 +1,16 @@
+@startuml
+package domain {
+    package configuration {}
+    package controller {}
+    package repository {
+        package contract {}
+        package model {}
+        package repository {}
+    }
+    package service {}
+}
+
+domain.controller --> domain.service
+domain.service --> domain.repository
+
+@enduml

@@ -1,19 +1,27 @@
-package via.easyflow.interactor.usecases.project
+package via.easyflow.interactor.usecases.cases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.error
+import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.annotation.Case
+import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.exceptions.exception.ConflictException
-import via.easyflow.interactor.usecases.UseCase
 import via.easyflow.shared.modules.project.api.service.IProjectMemberService
 import via.easyflow.shared.modules.project.api.service.UserExistsInProjectModuleInput
+import kotlin.reflect.KClass
 
 @Component
+@Case(CaseScope.PROJECT)
 class UsersMustNotBeInProjectCase(
     private val projectMemberService: IProjectMemberService,
-) : UseCase<UsersNotInProjectCaseInput, Mono<Unit>> {
-    override fun invoke(input: UsersNotInProjectCaseInput): Mono<Unit> {
+) : TypedUseCase<UsersMustNotBeInProjectCase.Input, Mono<Unit>> {
+    override fun getInputType(): KClass<Input> {
+        return Input::class
+    }
+
+    override fun invoke(input: Input): Mono<Unit> {
         val exists = Flux.fromIterable(input.userIds).flatMap {
             projectMemberService.userExistsInProject(
                 UserExistsInProjectModuleInput(
@@ -27,11 +35,11 @@ class UsersMustNotBeInProjectCase(
         }
         return exists.then(Mono.just(Unit))
     }
-}
 
-data class UsersNotInProjectCaseInput(
-    val projectId: String,
-    val userIds: List<String>
-) {
+    data class Input(
+        val projectId: String,
+        val userIds: List<String>
+    ) {
 
+    }
 }

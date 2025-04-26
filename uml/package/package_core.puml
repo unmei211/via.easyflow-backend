@@ -1,0 +1,60 @@
+@startuml
+package "core" {
+    package datasource {
+    }
+    package layer {
+        package converter {}
+        package exception {}
+        package factory {}
+        package manager {}
+    }
+    package "configuration" {
+    }
+    package tools {
+        package database {
+            package arguments {
+                package factory {}
+                package handler {}
+                package resolver {}
+            }
+            package mapper {}
+            package query {
+                package builder {}
+                package condition {}
+                package filter {}
+                package param {}
+                package resolver {}
+            }
+        }
+        package json {
+            package binder {
+            }
+            package io {
+            }
+        }
+        package logger {}
+        package uuid {}
+        package version {
+            package comparator {
+            }
+            package versionizer {
+            }
+        }
+    }
+}
+
+configuration --> layer
+configuration --> tools
+configuration -> datasource
+
+core.layer.manager --> core.layer.converter
+core.layer.factory --> core.layer.converter
+core.layer.converter --> core.layer.exception
+
+binder -> io
+
+core.tools.database.query.resolver --> core.tools.database.query.filter
+core.tools.database.query --> arguments
+
+database --> json
+@enduml

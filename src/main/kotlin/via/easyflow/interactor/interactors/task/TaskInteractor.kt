@@ -3,7 +3,6 @@ package via.easyflow.interactor.interactors.task
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.Mono.error
 import reactor.core.publisher.Mono.just
 import via.easyflow.core.tools.logger.logger
 import via.easyflow.interactor.interactors.task.contract.AddSubtaskInteractorInput
@@ -13,26 +12,22 @@ import via.easyflow.interactor.interactors.task.contract.AddUserTasksInProjectIn
 import via.easyflow.interactor.interactors.task.contract.ChangeTaskInteractorInput
 import via.easyflow.interactor.interactors.task.contract.GetTaskInfoInteractorInput
 import via.easyflow.interactor.interactors.task.contract.GetTasksByProjectInteractorInput
-import via.easyflow.interactor.usecases.project.ProjectIsAvailableForUserCase
-import via.easyflow.interactor.usecases.project.ProjectIsAvailableForUserCaseInput
-import via.easyflow.interactor.usecases.project.ProjectMustBeAvailableForUserCase
-import via.easyflow.interactor.usecases.project.ProjectMustBeAvailableForUserCaseInput
-import via.easyflow.interactor.usecases.task.AddSubtaskCase
-import via.easyflow.interactor.usecases.task.AddTaskCase
-import via.easyflow.interactor.usecases.task.AddTaskCaseInput
-import via.easyflow.interactor.usecases.task.AddTaskCommentCase
-import via.easyflow.interactor.usecases.task.ChangeTaskCase
-import via.easyflow.interactor.usecases.task.ChangeTaskCaseInput
-import via.easyflow.interactor.usecases.task.GetSubtaskCase
-import via.easyflow.interactor.usecases.task.GetTaskByIdCase
-import via.easyflow.interactor.usecases.task.GetTaskCommentsCase
-import via.easyflow.interactor.usecases.task.GetTasksByProjectCase
-import via.easyflow.interactor.usecases.task.GetUserTasksInProjectCase
-import via.easyflow.interactor.usecases.task.GetUserTasksInProjectCaseInput
-import via.easyflow.interactor.usecases.user.UserIsAvailableCase
-import via.easyflow.interactor.usecases.user.UserIsAvailableUseCaseInput
-import via.easyflow.interactor.usecases.user.UserMustBeAvailableCase
-import via.easyflow.interactor.usecases.user.UserMustBeAvailableUseCaseInput
+import via.easyflow.interactor.usecases.cases.project.ProjectIsAvailableForUserCase
+import via.easyflow.interactor.usecases.cases.project.ProjectMustBeAvailableForUserCase
+import via.easyflow.interactor.usecases.cases.task.AddSubtaskCase
+import via.easyflow.interactor.usecases.cases.task.AddTaskCase
+import via.easyflow.interactor.usecases.cases.task.AddTaskCommentCase
+import via.easyflow.interactor.usecases.cases.task.ChangeTaskCase
+import via.easyflow.interactor.usecases.cases.task.GetSubtaskCase
+import via.easyflow.interactor.usecases.cases.task.GetTaskByIdCase
+import via.easyflow.interactor.usecases.cases.task.GetTaskCommentsCase
+import via.easyflow.interactor.usecases.cases.task.GetTasksByProjectCase
+import via.easyflow.interactor.usecases.cases.task.GetUserTasksInProjectCase
+import via.easyflow.interactor.usecases.cases.user.UserIsAvailableCase
+import via.easyflow.interactor.usecases.cases.user.UserMustBeAvailableCase
+import via.easyflow.interactor.usecases.invoker.ProjectCaseInvoker
+import via.easyflow.interactor.usecases.invoker.TaskCaseInvoker
+import via.easyflow.interactor.usecases.invoker.UserCaseInvoker
 import via.easyflow.shared.exceptions.exception.ForbiddenException
 import via.easyflow.shared.exceptions.exception.NotFoundException
 import via.easyflow.shared.modules.task.model.SubtaskModel
@@ -42,39 +37,29 @@ import via.easyflow.shared.modules.task.model.flow.TaskInfoFlow
 
 @Component
 class TaskInteractor(
-    // Project
-    private val projectIsAvailableForUserCase: ProjectIsAvailableForUserCase,
-    private val projectMustBeAvailableForUserCase: ProjectMustBeAvailableForUserCase,
     // User
-    private val userIsAvailableCase: UserIsAvailableCase,
-    private val userMustBeAvailableCase: UserMustBeAvailableCase,
+    private val userInvoker: UserCaseInvoker,
+    // Project
+    private val projectInvoker: ProjectCaseInvoker,
     // Task
-    private val addTaskCase: AddTaskCase,
-    private val getUserTasksInProjectCase: GetUserTasksInProjectCase,
-    private val changeTaskCase: ChangeTaskCase,
-    private val getTaskByIdCase: GetTaskByIdCase,
-    private val addTaskCommentCase: AddTaskCommentCase,
-    private val getTasksByProjectCase: GetTasksByProjectCase,
-    private val addSubtaskCase: AddSubtaskCase,
-    private val getTaskCommentsCase: GetTaskCommentsCase,
-    private val getSubtasksCase: GetSubtaskCase
+    private val taskInvoker: TaskCaseInvoker,
 ) : ITaskInteractor {
     private val log = logger()
 
     override fun getTaskInfo(input: GetTaskInfoInteractorInput): Mono<TaskInfoFlow> {
-        val taskMono = getTaskByIdCase.invoke(
+        val taskMono: Mono<TaskModel> = taskInvoker.invoke(
             GetTaskByIdCase.Input(
                 taskId = input.taskId
             )
         )
 
-        val comments = getTaskCommentsCase.invoke(
+        val comments: Flux<TaskCommentModel> = taskInvoker.invoke(
             GetTaskCommentsCase.Input(
                 taskId = input.taskId
             )
         )
 
-        val subtasks = getSubtasksCase.invoke(
+        val subtasks: Flux<SubtaskModel> = taskInvoker.invoke(
             GetSubtaskCase.Input(
                 taskId = input.taskId
             )
@@ -95,13 +80,14 @@ class TaskInteractor(
     override fun addSubtask(input: AddSubtaskInteractorInput): Mono<SubtaskModel> {
         log.info("Starting to add subtask with title: '${input.title}' for task: ${input.taskId}")
 
-        val ownerIsAvailable = userMustBeAvailableCase.invoke(UserMustBeAvailableUseCaseInput(input.ownerId))
-            .doOnSubscribe { log.debug("Validating owner availability: ${input.ownerId}") }
-            .doOnSuccess { log.debug("Owner ${input.ownerId} validated successfully") }
-            .doOnError { log.error("Owner validation failed: ${it.message}") }
+        val ownerIsAvailable =
+            userInvoker.invoke<UserMustBeAvailableCase, _, _>(UserMustBeAvailableCase.Input(input.ownerId))
+                .doOnSubscribe { log.debug("Validating owner availability: ${input.ownerId}") }
+                .doOnSuccess { log.debug("Owner ${input.ownerId} validated successfully") }
+                .doOnError { log.error("Owner validation failed: ${it.message}") }
 
-        val projectIsAvailableForOwner = projectMustBeAvailableForUserCase.invoke(
-            ProjectMustBeAvailableForUserCaseInput(
+        val projectIsAvailableForOwner = projectInvoker.invoke<ProjectMustBeAvailableForUserCase, _, _>(
+            ProjectMustBeAvailableForUserCase.Input(
                 userId = input.ownerId,
                 projectId = input.projectId
             )
@@ -118,8 +104,8 @@ class TaskInteractor(
 
         val assigneeAvailable = assigneeNeeded.flatMap {
             log.debug("Validating assignee availability: $it")
-            userMustBeAvailableCase.invoke(
-                UserMustBeAvailableUseCaseInput(
+            userInvoker.invoke<UserMustBeAvailableCase, _, _>(
+                UserMustBeAvailableCase.Input(
                     userId = it
                 )
             ).doOnSuccess { _ -> log.debug("Assignee $it validated successfully") }
@@ -128,8 +114,8 @@ class TaskInteractor(
 
         val projectIsAvailableForAssignee = assigneeNeeded.flatMap {
             log.debug("Validating project availability for assignee: project=${input.projectId}, assignee=$it")
-            projectIsAvailableForUserCase.invoke(
-                ProjectIsAvailableForUserCaseInput(
+            projectInvoker.invoke<ProjectIsAvailableForUserCase, _, _>(
+                ProjectIsAvailableForUserCase.Input(
                     userId = it,
                     projectId = input.projectId
                 )
@@ -147,7 +133,7 @@ class TaskInteractor(
 
         return validatedStream.flatMap {
             log.info("Creating subtask with title: '${input.title}' for task: ${input.taskId}")
-            addSubtaskCase.invoke(
+            taskInvoker.invoke<AddSubtaskCase, _, _>(
                 AddSubtaskCase.Input(
                     ownerId = input.ownerId,
                     taskId = input.taskId,
@@ -161,7 +147,7 @@ class TaskInteractor(
     }
 
     override fun getTasksByProject(input: GetTasksByProjectInteractorInput): Flux<TaskModel> {
-        return getTasksByProjectCase.invoke(
+        return taskInvoker.invoke(
             GetTasksByProjectCase.Input(
                 projectId = input.projectId
             )
@@ -169,23 +155,23 @@ class TaskInteractor(
     }
 
     override fun addTaskComment(input: AddTaskCommentInteractorInput): Mono<TaskCommentModel> {
-        val userAvailability: Mono<Unit> = userMustBeAvailableCase.invoke(
-            UserMustBeAvailableUseCaseInput(
+        val userAvailability: Mono<Unit> = userInvoker.invoke(
+            UserMustBeAvailableCase.Input(
                 userId = input.userId
             ),
         )
-        val foundedTask: Mono<TaskModel> = getTaskByIdCase.invoke(GetTaskByIdCase.Input(input.taskId))
+        val foundedTask: Mono<TaskModel> = taskInvoker.invoke(GetTaskByIdCase.Input(input.taskId))
 
         return userAvailability.zipWith(foundedTask)
             .flatMap {
-                projectMustBeAvailableForUserCase.invoke(
-                    ProjectMustBeAvailableForUserCaseInput(
+                projectInvoker.invoke<ProjectMustBeAvailableForUserCase, _, _>(
+                    ProjectMustBeAvailableForUserCase.Input(
                         userId = input.userId,
                         projectId = it.t2.projectId,
                     ),
                 )
             }.flatMap {
-                addTaskCommentCase.invoke(
+                taskInvoker.invoke(
                     AddTaskCommentCase.Input(
                         taskId = input.taskId,
                         userId = input.userId,
@@ -196,22 +182,22 @@ class TaskInteractor(
     }
 
     override fun changeTask(input: ChangeTaskInteractorInput): Mono<TaskModel> {
-        val projectValidated = projectMustBeAvailableForUserCase.invoke(
-            ProjectMustBeAvailableForUserCaseInput(
+        val projectValidated = projectInvoker.invoke<ProjectMustBeAvailableForUserCase, _, _>(
+            ProjectMustBeAvailableForUserCase.Input(
                 userId = input.changerUserId,
                 projectId = input.projectId,
             )
         )
-        val userValidated = userMustBeAvailableCase.invoke(
-            input = UserMustBeAvailableUseCaseInput(
+        val userValidated = userInvoker.invoke<UserMustBeAvailableCase, _, _>(
+            input = UserMustBeAvailableCase.Input(
                 userId = input.changerUserId
             )
         )
 
         return projectValidated.zipWith(userValidated)
             .flatMap {
-                changeTaskCase.invoke(
-                    ChangeTaskCaseInput(
+                taskInvoker.invoke(
+                    ChangeTaskCase.Input(
                         taskName = input.name,
                         taskDescription = input.description,
                         userId = input.changerUserId,
@@ -225,8 +211,8 @@ class TaskInteractor(
     }
 
     override fun getUserTasksInProject(input: AddUserTasksInProjectInteractorInput): Flux<TaskModel> {
-        val projectIsAvailableValidated = projectIsAvailableForUserCase.invoke(
-            ProjectIsAvailableForUserCaseInput(
+        val projectIsAvailableValidated = projectInvoker.invoke<ProjectIsAvailableForUserCase, _, _>(
+            ProjectIsAvailableForUserCase.Input(
                 userId = input.userId,
                 projectId = input.projectId,
             )
@@ -235,16 +221,16 @@ class TaskInteractor(
             else error(ForbiddenException("User tasks not available"))
         }
 
-        val userIsAvailableValidated = userMustBeAvailableCase.invoke(
-            UserMustBeAvailableUseCaseInput(
+        val userIsAvailableValidated = userInvoker.invoke<UserMustBeAvailableCase, _, _>(
+            UserMustBeAvailableCase.Input(
                 userId = input.userId
             )
         )
 
         return projectIsAvailableValidated.zipWith(userIsAvailableValidated)
             .thenMany(
-                getUserTasksInProjectCase.invoke(
-                    GetUserTasksInProjectCaseInput(
+                taskInvoker.invoke(
+                    GetUserTasksInProjectCase.Input(
                         projectId = input.projectId,
                         userId = input.userId
                     )
@@ -253,24 +239,24 @@ class TaskInteractor(
     }
 
     override fun addTask(input: AddTaskInteractorInput): Mono<TaskModel> {
-        val userCaseInput = UserIsAvailableUseCaseInput(
+        val userCaseInput = UserIsAvailableCase.Input(
             userId = input.userId
         )
 
-        val projectInput = ProjectIsAvailableForUserCaseInput(
+        val projectInput = ProjectIsAvailableForUserCase.Input(
             userId = input.userId,
             projectId = input.projectId
         )
 
-        val addTaskInput = AddTaskCaseInput(
+        val addTaskInput = AddTaskCase.Input(
             taskName = input.taskName,
             taskDescription = input.taskDescription,
             userId = input.userId,
             projectId = input.projectId,
         )
 
-        val userAvailableMono = userIsAvailableCase.invoke(userCaseInput)
-            .flatMap {
+        val userAvailableMono =
+            userInvoker.invoke<_, UserIsAvailableCase.Input, Mono<Boolean>>(userCaseInput).flatMap {
                 if (it) {
                     just(it)
                 } else {
@@ -278,7 +264,7 @@ class TaskInteractor(
                 }
             }
 
-        val projectAvailableMono = projectIsAvailableForUserCase.invoke(projectInput)
+        val projectAvailableMono = projectInvoker.invoke<ProjectIsAvailableForUserCase, _, _>(projectInput)
             .flatMap {
                 if (it) just(it)
                 else error(NotFoundException("Can't find project"))
@@ -286,7 +272,7 @@ class TaskInteractor(
 
         val validated = userAvailableMono.zipWith(projectAvailableMono).then()
 
-        val addedTask: Mono<TaskModel> = validated.then(Mono.defer { addTaskCase.invoke(addTaskInput) })
+        val addedTask: Mono<TaskModel> = validated.then(Mono.defer { taskInvoker.invoke(addTaskInput) })
 
         return addedTask
     }
