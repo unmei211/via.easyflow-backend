@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+package "interactor" {
+    package adapter {}
+    package configuration {}
+    package controller {
+        package domain {
+            package model {}
+        }
+    }
+    package interactors {
+        package domain {
+            package contract {
+            }
+        }
+    }
+    package usecases {
+        package annotation {}
+        package cases {}
+        package invoker {}
+    }
+}
+
+controller --> interactors
+
+interactor.configuration --> interactor.usecases
+
+interactor.interactors --> interactor.usecases
+invoker --> annotation
+cases --> annotation
+invoker -> cases
+
+cases ---> adapter
+@enduml

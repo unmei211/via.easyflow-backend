@@ -1,0 +1,32 @@
+@startuml
+package "shared" {
+    package "exceptions" {
+    }
+
+    package "modules" {
+        package "auth" {
+        }
+        package "project" {
+        }
+        package "task" {
+        }
+        package "exampleModule" {
+            package "api" {
+                package "controller" {
+                }
+                package "inputs" {
+                }
+                package "outputs" {
+                }
+                package "service" {
+                }
+            }
+            package "model" {
+            }
+        }
+    }
+}
+
+modules --> exceptions
+
+@enduml

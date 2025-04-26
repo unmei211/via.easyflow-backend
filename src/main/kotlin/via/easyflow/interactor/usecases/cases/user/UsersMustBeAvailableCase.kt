@@ -5,16 +5,20 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.error
 import reactor.core.publisher.Mono.just
+import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.annotation.Case
+import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.exceptions.exception.NotFoundException
-import via.easyflow.interactor.usecases.UseCase
 import via.easyflow.shared.modules.auth.api.inputs.user.ExistsUserIn
 import via.easyflow.shared.modules.auth.api.service.IUserService
+import kotlin.reflect.KClass
 
 @Component
+@Case(CaseScope.USER)
 class UsersMustBeAvailableCase(
     private val userService: IUserService
-) : UseCase<UsersMustBeAvailableCaseInput, Mono<Unit>> {
-    override fun invoke(input: UsersMustBeAvailableCaseInput): Mono<Unit> {
+) : TypedUseCase<UsersMustBeAvailableCase.Input, Mono<Unit>> {
+    override fun invoke(input: Input): Mono<Unit> {
         return Flux
             .fromIterable(input.userIds)
             .flatMap {
@@ -28,8 +32,10 @@ class UsersMustBeAvailableCase(
                 }
             }.then(just(Unit))
     }
-}
 
-data class UsersMustBeAvailableCaseInput(
-    val userIds: List<String>
-)
+    override fun getInputType(): KClass<Input> = Input::class
+
+    data class Input(
+        val userIds: List<String>
+    )
+}

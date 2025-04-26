@@ -2,17 +2,25 @@ package via.easyflow.interactor.usecases.cases.task
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import via.easyflow.interactor.usecases.UseCase
+import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.annotation.Case
+import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.modules.task.api.inputs.ChangeTaskIn
 import via.easyflow.shared.modules.task.api.inputs.view.ChangeTaskView
 import via.easyflow.shared.modules.task.api.service.ITaskService
 import via.easyflow.shared.modules.task.model.TaskModel
+import kotlin.reflect.KClass
 
 @Component
+@Case(CaseScope.TASK)
 class ChangeTaskCase(
     private val taskService: ITaskService,
-) : UseCase<ChangeTaskCaseInput, Mono<TaskModel>> {
-    override fun invoke(input: ChangeTaskCaseInput): Mono<TaskModel> {
+) : TypedUseCase<ChangeTaskCase.Input, Mono<TaskModel>> {
+    override fun getInputType(): KClass<Input> {
+        return Input::class
+    }
+
+    override fun invoke(input: Input): Mono<TaskModel> {
         return taskService.changeTask(
             ChangeTaskIn(
                 task = ChangeTaskView(
@@ -26,14 +34,14 @@ class ChangeTaskCase(
             )
         )
     }
-}
 
-data class ChangeTaskCaseInput(
-    val taskName: String,
-    val taskDescription: String,
-    val userId: String,
-    val projectId: String,
-    val taskVersion: String,
-    val taskStatus: String,
-    val taskId: String
-)
+    data class Input(
+        val taskName: String,
+        val taskDescription: String,
+        val userId: String,
+        val projectId: String,
+        val taskVersion: String,
+        val taskStatus: String,
+        val taskId: String
+    )
+}

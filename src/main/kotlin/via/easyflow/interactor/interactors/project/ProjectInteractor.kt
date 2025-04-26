@@ -7,45 +7,37 @@ import via.easyflow.interactor.interactors.project.contract.ConnectProjectMember
 import via.easyflow.interactor.interactors.project.contract.CreateProjectInteractorInput
 import via.easyflow.interactor.interactors.project.contract.GetProjectMembersInteractorInput
 import via.easyflow.interactor.usecases.cases.project.ConnectOwnerToProjectCase
-import via.easyflow.interactor.usecases.cases.project.ConnectOwnerToProjectCaseInput
 import via.easyflow.interactor.usecases.cases.project.ConnectProjectMembersCase
-import via.easyflow.interactor.usecases.cases.project.ConnectProjectMembersCaseInput
 import via.easyflow.interactor.usecases.cases.project.CreateProjectCase
-import via.easyflow.interactor.usecases.cases.project.CreateProjectCaseInput
 import via.easyflow.interactor.usecases.cases.project.GetProjectMembersCase
-import via.easyflow.interactor.usecases.cases.project.GetProjectMembersCaseInput
 import via.easyflow.interactor.usecases.cases.project.ProjectMustBeAvailableForUserCase
-import via.easyflow.interactor.usecases.cases.project.ProjectMustBeAvailableForUserCaseInput
 import via.easyflow.interactor.usecases.cases.project.UsersMustNotBeInProjectCase
-import via.easyflow.interactor.usecases.cases.project.UsersNotInProjectCaseInput
 import via.easyflow.interactor.usecases.cases.user.UserMustBeAvailableCase
-import via.easyflow.interactor.usecases.cases.user.UserMustBeAvailableUseCaseInput
 import via.easyflow.interactor.usecases.cases.user.UsersMustBeAvailableCase
-import via.easyflow.interactor.usecases.cases.user.UsersMustBeAvailableCaseInput
+import via.easyflow.interactor.usecases.invoker.ProjectCaseInvoker
+import via.easyflow.interactor.usecases.invoker.TaskCaseInvoker
+import via.easyflow.interactor.usecases.invoker.UserCaseInvoker
 import via.easyflow.shared.modules.project.model.ProjectDetailsModel
 import via.easyflow.shared.modules.project.model.ProjectMemberModel
 
 @Component
 class ProjectInteractor(
-    private val userIsAvailableCase: UserMustBeAvailableCase,
-    private val usersMustBeAvailableCase: UsersMustBeAvailableCase,
-    private val usersMustNotBeInProjectCase: UsersMustNotBeInProjectCase,
-
-    private val createProjectCase: CreateProjectCase,
-    private val connectOwnerToProjectCase: ConnectOwnerToProjectCase,
-    private val connectProjectMembersCase: ConnectProjectMembersCase,
-    private val getProjectMembersCase: GetProjectMembersCase,
-    private val projectMustBeAvailableForUserCase: ProjectMustBeAvailableForUserCase
+    // User
+    private val userInvoker: UserCaseInvoker,
+    // Project
+    private val projectInvoker: ProjectCaseInvoker,
+    // Task
+    private val taskInvoker: TaskCaseInvoker
 ) : IProjectInteractor {
     override fun getProjectMembers(input: GetProjectMembersInteractorInput): Flux<ProjectMemberModel> {
-        val userAvailableValidated = usersMustBeAvailableCase.invoke(
-            UsersMustBeAvailableCaseInput(
+        val userAvailableValidated: Mono<Unit> = userInvoker.invoke(
+            UsersMustBeAvailableCase.Input(
                 userIds = listOf(input.userId),
             )
         )
 
-        val projectAvailableForUserValidated = projectMustBeAvailableForUserCase.invoke(
-            input = ProjectMustBeAvailableForUserCaseInput(
+        val projectAvailableForUserValidated = projectInvoker.invoke<ProjectMustBeAvailableForUserCase, _, _>(
+            input = ProjectMustBeAvailableForUserCase.Input(
                 userId = input.userId,
                 projectId = input.projectId
             )
@@ -53,8 +45,8 @@ class ProjectInteractor(
 
         return userAvailableValidated.zipWith(projectAvailableForUserValidated)
             .thenMany(
-                getProjectMembersCase.invoke(
-                    GetProjectMembersCaseInput(
+                projectInvoker.invoke(
+                    GetProjectMembersCase.Input(
                         projectId = input.projectId
                     )
                 )
@@ -62,23 +54,23 @@ class ProjectInteractor(
     }
 
     override fun connectMembers(input: ConnectProjectMembersInteractorInput): Flux<ProjectMemberModel> {
-        val usersToProjectValidated = usersMustNotBeInProjectCase.invoke(
-            input = UsersNotInProjectCaseInput(
+        val usersToProjectValidated: Mono<Unit> = projectInvoker.invoke(
+            input = UsersMustNotBeInProjectCase.Input(
                 projectId = input.projectId,
                 userIds = input.userIds
             )
         )
 
-        val usersAvailableValidated = usersMustBeAvailableCase.invoke(
-            UsersMustBeAvailableCaseInput(
+        val usersAvailableValidated: Mono<Unit> = userInvoker.invoke(
+            UsersMustBeAvailableCase.Input(
                 userIds = input.userIds
             )
         )
 
         return usersAvailableValidated.zipWith(usersToProjectValidated)
             .thenMany(
-                connectProjectMembersCase.invoke(
-                    ConnectProjectMembersCaseInput(
+                projectInvoker.invoke(
+                    ConnectProjectMembersCase.Input(
                         projectId = input.projectId,
                         userIds = input.userIds
                     )
@@ -87,23 +79,23 @@ class ProjectInteractor(
     }
 
     override fun createProject(input: CreateProjectInteractorInput): Mono<ProjectDetailsModel> {
-        val userValidated = userIsAvailableCase.invoke(
-            UserMustBeAvailableUseCaseInput(
+        val userValidated: Mono<Unit> = userInvoker.invoke(
+            UserMustBeAvailableCase.Input(
                 userId = input.userId
             )
         )
 
         return userValidated.then(
-            createProjectCase.invoke(
-                CreateProjectCaseInput(
+            projectInvoker.invoke<CreateProjectCase, _, _>(
+                CreateProjectCase.Input(
                     ownerId = input.userId,
                     projectName = input.projectName,
                     projectDescription = input.projectDescription,
                 )
             )
         ).flatMap { (project, owner) ->
-            connectOwnerToProjectCase.invoke(
-                ConnectOwnerToProjectCaseInput(
+            projectInvoker.invoke<ConnectOwnerToProjectCase, _, _>(
+                ConnectOwnerToProjectCase.Input(
                     projectId = project.projectId ?: "",
                     userId = owner.userId,
                 )

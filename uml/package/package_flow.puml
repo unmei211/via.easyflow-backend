@@ -1,0 +1,29 @@
+@startuml
+package "via.easyflow" {
+    package "core" {
+    }
+
+    package "interactor" {
+    }
+
+    package "modules" {
+        package "auth" {
+        }
+        package "project" {
+        }
+        package "task" {
+        }
+    }
+
+    package "shared" {
+    }
+}
+
+auth --> shared
+project --> shared
+task --> shared
+
+modules --> core
+interactor --> core
+
+@enduml
