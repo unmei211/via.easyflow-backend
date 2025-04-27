@@ -1,0 +1,87 @@
+@startuml
+left to right direction
+'top to bottom direction
+database "Database" as db
+
+package "InteractionLayer" {
+
+    frame "Interactor" {
+          [ProjectInteractor] as pi
+          [UserInteractor] as ui
+          [TaskInteractor] as ti
+
+          () IProjectInteractor as ipi
+          () ITaskInteractor as iti
+          () IUserInteractor as iui
+
+          [pi] ..|> ipi
+          [ui] ..|> iui
+          [ti] ..|> iti
+    }
+
+    frame "UseCases" {
+
+        frame "CaseInvokers" {
+        () CaseInvoker as ci
+
+        [ProjectCaseInvoker] as pci
+        [TaskCaseInvoker] as tci
+        [UserCaseInvoker] as uci
+
+
+        [pci] ..|> ci
+        [tci] ..|> ci
+        [uci] ..|> ci
+
+        "Interactor" ..> "CaseInvokers"
+        }
+
+
+        frame Cases {
+            [ProjectCases] as pc
+            [TaskCases] as tc
+            [UserCases] as uc
+        }
+
+        "CaseInvokers" *-- Cases
+    }
+}
+
+package "ModulesLayer" {
+    frame "Repository" {
+        () IModuleRepository as imp
+        [ModuleRepository] as mr
+
+        mr ..|> imp
+
+        mr o-right- db
+    }
+    frame "Service" {
+       [ModuleService] as ms
+
+       ms ..> imp
+    }
+     frame "Controller" {
+       [ModuleController] as mc
+     }
+}
+
+package "Shared" {
+    frame "Api" {
+        () IModuleService as ims
+        () IModuleController as imc
+
+        mc ..> ms
+
+        ms ...|> ims
+
+        mc ..|> imc
+    }
+    frame "Model" {
+    }
+
+    "Api" -> "Model"
+}
+
+"Cases" -up-> ims
+@enduml

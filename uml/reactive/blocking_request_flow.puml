@@ -1,0 +1,40 @@
+@startuml
+title Блокирующая обработка запросов
+
+actor Client as cl
+participant "TaskController" as tc
+participant "TaskService" as ts
+participant "ProjectRepository" as pr
+participant "TaskRepository" as tr
+participant "UserRepository" as ur
+
+cl -> tc : addTask(task)
+activate tc
+
+tc -> ts : addTask(task)
+activate ts
+
+ts -> ur : checkExists(userId)
+activate ur
+
+ur --> ts : return exists
+deactivate ur
+
+ts -> pr : userInProject(userId, projectId)
+activate pr
+
+pr --> ts : return userInProject
+deactivate pr
+
+ts -> tr : insertTask()
+activate tr
+
+tr --> ts : return task
+deactivate tr
+
+ts --> tc : return insertedTask
+deactivate ts
+
+tc --> cl : return response
+deactivate tc
+@enduml

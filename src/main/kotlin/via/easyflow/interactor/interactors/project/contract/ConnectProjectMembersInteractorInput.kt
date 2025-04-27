@@ -1,6 +1,6 @@
 package via.easyflow.interactor.interactors.project.contract
 
-data class ConnectProjectMembersInteractorInput(
+data class ConnectProjectaaaaaaaaaaaaaaaaaaaaMembersInteractorInput(
     val projectId: String,
     val userIds: List<String>,
 ) {

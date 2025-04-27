@@ -53,7 +53,7 @@ class ProjectInteractor(
             )
     }
 
-    override fun connectMembers(input: ConnectProjectMembersInteractorInput): Flux<ProjectMemberModel> {
+    override fun connectMembers(input: aConnectProjectMembersInteractorInput): Flux<ProjectMemberModel> {
         val usersToProjectValidated: Mono<Unit> = projectInvoker.invoke(
             input = UsersMustNotBeInProjectCase.Input(
                 projectId = input.projectId,

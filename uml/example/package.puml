@@ -1,0 +1,14 @@
+@startuml
+left to right direction
+package "com.example.controller" {
+  class TaskController
+}
+package "com.example.service" {
+  class TaskService
+}
+package "com.example.repository" {
+  class TaskRepository
+}
+TaskController --> TaskService
+TaskService --> TaskRepository
+@enduml

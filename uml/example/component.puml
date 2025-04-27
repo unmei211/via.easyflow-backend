@@ -1,0 +1,61 @@
+@startuml
+'interface ITaskService
+'interface IUserService
+'
+'[TaskService <<component>>] ..|> ITaskService
+'[UserService <<component>>] ..|> IUserService
+'
+'[TaskController <<component>>] --> ITaskService
+'[UserController <<component>>] --> IUserService
+'
+'package "Application Layer" {
+'  [TaskService <<component>>]
+'}
+'
+'package "Adapter Layer" {
+'  [TaskController <<component>>]
+'  [DatabaseAdapter <<component>>]
+'}
+'
+'[TaskController] --> [TaskService]
+'[TaskService] --> [DatabaseAdapter]
+'title Архитектура компонентов Task Manager
+'
+'package "Presentation Layer" {
+'    [TaskController <<controller>>]
+'    [UserController <<controller>>]
+'}
+'
+'package "Application Layer" {
+'    [TaskService <<service>>]
+'    [UserService <<service>>]
+'}
+'
+'package "Infrastructure Layer" {
+'    [TaskRepository <<repository>>]
+'    [UserRepository <<repository>>]
+'    [ExternalTimeTrackerApi <<external service>>]
+'}
+'
+'database "PostgreSQL" as db
+'
+'' Связи между слоями
+'[TaskController] --> [TaskService]
+'[UserController] --> [UserService]
+'
+'[TaskService] --> [TaskRepository]
+'[TaskService] --> [ExternalTimeTrackerApi]
+'
+'[UserService] --> [UserRepository]
+'
+'[TaskRepository] --> db
+'[UserRepository] --> db
+'
+'' Внешние зависимости
+'[ExternalTimeTrackerApi] ..> (TimeTrackerSystem)
+'cloud (TimeTrackerSystem)
+'package InteractorLayer {
+'    []
+'}
+
+@enduml

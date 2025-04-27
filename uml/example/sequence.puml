@@ -1,0 +1,13 @@
+@startuml
+participant Client
+participant Controller
+participant Service
+participant Repository
+
+Client -> Controller: createTask(data)
+Controller -> Service: create(data)
+Service -> Repository: save(data)
+Repository --> Service: id
+Service --> Controller: result
+Controller --> Client: response
+@enduml

@@ -1,0 +1,10 @@
+@startuml
+start
+:Validate Input;
+if (valid?) then (yes)
+  :Create Task;
+else (no)
+  :Error Message;
+endif
+stop
+@enduml
