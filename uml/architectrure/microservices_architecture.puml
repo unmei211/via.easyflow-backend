@@ -1,0 +1,186 @@
+@startuml
+
+package "Shared" {
+    frame "Api" {
+        frame "Service" as ss {
+            () IUserService as ius
+            () ITaskService as its
+            () IProjectService as ips
+        }
+        frame "Controller" as sc {
+            () IUserController as iuc
+            () ITaskController as itc
+            () IProjectController as ipc
+        }
+    }
+    frame "Model" {
+    }
+
+    "Api" -> "Model"
+}
+
+
+node "Interaction Microservice" as im {
+    frame "Interactor" {
+        [ProjectInteractor] as pi
+        [UserInteractor] as ui
+        [TaskInteractor] as ti
+
+        () IProjectInteractor as ipi
+        () ITaskInteractor as iti
+        () IUserInteractor as iui
+
+        [pi] ..|> ipi
+        [ui] ..|> iui
+        [ti] ..|> iti
+    }
+
+    frame Adapter {
+        () IProjectAdapter as ipa
+        () ITaskAdapter as ita
+        () IUserAdapter as iua
+
+        ipa --|> ips
+        ita --|> its
+        iua --|> ius
+
+        component ProjectAdapter as pa {
+            port " " as pap
+        }
+        component TaskAdapter as ta {
+            port " " as tap
+        }
+        component UserAdapter as ua {
+            port " " as uap
+        }
+
+        pa ..|> ipa
+        ta ..|> ita
+        ua ..|> iua
+    }
+    frame "Configuration" {
+        [WebClient] as wc
+    }
+    Adapter *-- wc
+
+    frame "UseCases" {
+
+        frame "CaseInvokers" {
+            () CaseInvoker as ci
+
+            [ProjectCaseInvoker] as pci
+            [TaskCaseInvoker] as tci
+            [UserCaseInvoker] as uci
+
+
+            [pci] ..|> ci
+            [tci] ..|> ci
+            [uci] ..|> ci
+
+            "Interactor" ..> "CaseInvokers"
+        }
+
+
+        frame Cases {
+            [ProjectCases] as pc
+            [TaskCases] as tc
+            [UserCases] as uc
+        }
+
+        "CaseInvokers" *-- Cases
+
+        Cases *-- Adapter
+    }
+}
+
+node "User Microservice" as um {
+    frame "Repository" as umr {
+
+    }
+    frame "Service" as ums {
+        [Service] as ums_s
+
+        ums_s ..|> ius
+    }
+    frame "Controller"  as umc {
+        [Controller] as umc_c
+
+        umc_c ..|> sc
+    }
+
+    database UserDatabase as ud
+
+    umr *-- ud
+
+    umc *-- ums
+
+    ums *-- umr
+
+    port " " as ump
+
+    ump -- umc_c
+
+    uap --> ump
+}
+
+node "Task Microservice" as tm {
+    frame "Repository" as tmr {
+
+    }
+    frame "Service" as tms {
+        [Service] as tms_s
+
+        tms_s ..|> its
+    }
+    frame "Controller"  as tmc {
+        [Controller] as tmc_c
+
+        tmc_c ..|> sc
+    }
+
+    database TaskDatabase as td
+
+    tmr *-- td
+
+    tmc *-- tms
+
+    tms *-- tmr
+
+    port " " as tmp
+
+    tmp -- tmc_c
+
+    tap --> tmp
+}
+
+node "Project Microservice" as pm {
+    frame "Repository" as pmr {
+
+    }
+    frame "Service" as pms {
+        [Service] as pms_s
+
+        pms_s ..|> ips
+
+    }
+    frame "Controller"  as pmc {
+        [Controller] as pmc_c
+
+        pmc_c ..|> sc
+    }
+
+    database ProjectDatabase as pd
+
+    pmr *-- pd
+
+    pmc *-- pms
+
+    pms *-- pmr
+
+    port " " as pmp
+
+    pmp -- pmc_c
+
+    pap --> pmp
+}
+@enduml

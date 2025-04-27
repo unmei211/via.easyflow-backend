@@ -1,6 +1,9 @@
 @startuml
+
+title "Monolith"
+
 left to right direction
-'top to bottom direction
+
 database "Database" as db
 
 package "InteractionLayer" {
@@ -45,6 +48,11 @@ package "InteractionLayer" {
 
         "CaseInvokers" *-- Cases
     }
+
+    frame "Controllers" {
+
+    }
+    "Controllers" *-- "Interactor"
 }
 
 package "ModulesLayer" {
@@ -54,7 +62,7 @@ package "ModulesLayer" {
 
         mr ..|> imp
 
-        mr o-right- db
+        mr o-up- db
     }
     frame "Service" {
        [ModuleService] as ms
