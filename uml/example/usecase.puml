@@ -1,9 +1,0 @@
-@startuml
-actor User
-rectangle System {
-  usecase "Create Task" as UC1
-  usecase "View Task"   as UC2
-}
-User --> UC1
-User --> UC2
-@enduml

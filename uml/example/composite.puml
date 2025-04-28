@@ -1,8 +1,0 @@
-@startuml
-class OrderProcessor {
-  {field} repository : OrderRepository
-  {field} validator  : OrderValidator
-}
-OrderProcessor <|-- OrderValidator
-OrderProcessor --> OrderRepository
-@enduml

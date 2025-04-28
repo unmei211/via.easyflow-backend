@@ -1,0 +1,130 @@
+@startuml
+
+frame TaskDomain {
+    entity "Subtask" as se {
+        subtaskId: String
+        taskId: String
+        title: String
+        ownerId: String
+        description: String?
+        assigneeId: String?
+        status: String
+        createdAt: Instant
+        updatedAt: Instant
+    }
+
+    entity "TaskComment" as tce {
+        taskCommentId: String
+        taskId: String
+        userId: String
+        comment: String
+        createdAt: Instant
+        updatedAt: Instant
+    }
+
+    entity "Task" as te {
+        name: String
+        taskId: String
+        description: String?
+        status: String
+        createdAt: Instant
+        updatedAt: Instant?
+        ownerUserId: String
+        projectId: String
+        version: String
+    }
+
+    entity "TaskHistory" as the {
+        taskHistoryId: String?
+        taskId: String
+        name: String
+        description: String?
+        status: String
+        createdAt: Instant
+        updatedAt: Instant?
+        ownerUserId: String
+        changerId: String
+        projectId: String
+        version: String
+        moveAt: Instant
+    }
+}
+
+frame ProjectDomain {
+    entity "ProjectDefaultRole" as pdre {
+        defaultRoleId: String
+        projectId: String
+        projectRoleId: String
+    }
+
+    entity "ProjectRole" as pre {
+        projectRoleId: String
+        projectId: String
+        name: String
+        description: String?
+        color: String
+    }
+
+    entity "Project" as pe {
+        projectId: String
+        name: String
+        description: String?
+        createdAt: LocalDateTime
+    }
+
+    entity "ProjectOwner" as poe {
+        userId: String
+        projectId: String
+    }
+
+    entity "ProjectMember" as pme {
+        projectMemberId: String
+        projectId: String
+        userId: String
+        joinedAt: LocalDateTime
+    }
+
+    entity "ProjectMemberRole" as pmre {
+        projectMemberRoleId: String
+        projectMemberId: String
+        projectRoleId: String
+        grantedAt: LocalDateTime
+    }
+}
+
+frame UserDomain {
+    entity "User" as ue {
+        userId: String
+        name: String
+        createdAt: LocalDateTime
+    }
+}
+
+ue ||--o{ poe : userId
+
+poe ||--|| pe : projectId
+
+ue ||--o{ pme : userId
+
+pe ||--o{ pme : projectId
+
+pme ||--o{ pmre : projectMemberId
+
+pre ||--o{ pmre : projectRoleId
+
+pe ||--o{ pre : projectId
+
+pre ||--|| pdre : projectRoleId
+
+ue ||--o{ te : userId
+
+pe ||--o{ te : projectId
+
+te ||--o{ se : taskId
+
+ue ||--o{ se : userId / ownerId
+
+te ||--o{ tce : taskId
+
+te ||--o{ the : taskId
+@enduml
