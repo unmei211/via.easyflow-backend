@@ -6,7 +6,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.DefaultListableBeanFactory
 import org.springframework.beans.factory.support.GenericBeanDefinition
 import org.springframework.context.annotation.Configuration
-import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.cases.TypedUseCase
 import via.easyflow.interactor.usecases.annotation.Case
 
 @Configuration

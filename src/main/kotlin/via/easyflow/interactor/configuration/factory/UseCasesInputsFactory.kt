@@ -2,7 +2,7 @@ package via.easyflow.interactor.configuration.factory
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.stereotype.Component
-import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.cases.TypedUseCase
 import kotlin.reflect.KClass
 
 @Component("useCasesInputFactory")

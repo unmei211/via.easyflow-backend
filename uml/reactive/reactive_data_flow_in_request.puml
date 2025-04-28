@@ -1,0 +1,42 @@
+@startuml
+title Реактивное получение данных со стороны клиента
+
+actor User as u
+
+participant ReactiveBackend as b
+database Database as db
+
+u -> b : Запрос\nна получение\nсписка элементов
+activate b
+
+b -> db : Получить N\nэлементов
+deactivate b
+
+activate db
+
+db --> b : Элемент N0
+activate b
+
+b --> u : Отправка пользователю
+deactivate b
+
+db --> b : Элемент N1
+activate b
+
+b --> u : Отправка пользователю
+deactivate b
+
+db --> b : Элемент N2
+activate b
+
+b --> u : Отправка пользователю
+deactivate b
+
+db --> b : Элементов больше нет
+deactivate db
+activate b
+
+b --> u : Запрос выполнен
+deactivate b
+
+@enduml

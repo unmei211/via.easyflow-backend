@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.error
-import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.cases.TypedUseCase
 import via.easyflow.interactor.usecases.annotation.Case
 import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.exceptions.exception.ConflictException

@@ -2,7 +2,7 @@ package via.easyflow.interactor.usecases.cases.project
 
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import via.easyflow.interactor.usecases.TypedUseCase
+import via.easyflow.interactor.usecases.cases.TypedUseCase
 import via.easyflow.interactor.usecases.annotation.Case
 import via.easyflow.interactor.usecases.annotation.CaseScope
 import via.easyflow.shared.exceptions.exception.ForbiddenException

@@ -1,4 +1,4 @@
-package via.easyflow.interactor.usecases
+package via.easyflow.interactor.usecases.cases
 
 import kotlin.reflect.KClass
 
