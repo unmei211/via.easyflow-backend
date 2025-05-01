@@ -1,0 +1,128 @@
+@startuml
+left to right direction
+
+package query {
+    package builder {
+        interface IQueryBuilder {
+            +build(filters: List<IQueryFilter>): String
+            +merge(filters: List<IQueryFilter>, sql: String): String
+            +merge(filters: String, sql: String): String
+        }
+
+        class SimpleQueryBuilder {
+            +build(filters: List<IQueryFilter>): String
+            +merge(filters: List<IQueryFilter>, sql: String): String
+            +merge(filters: String, sql: String): String
+        }
+
+        SimpleQueryBuilder ..|> IQueryBuilder
+    }
+
+    package condition {
+        interface IConditionWrapper {
+            +wrap(fieldName: String, placeholder: String, condition: String): String
+            +wrap(fieldName: String, condition: String): String
+            +wrap(vararg bundles: Pair<Pair<String, String>, String>): String
+            +wrap(param: List<IQueryParam>, condition: String): String
+        }
+
+        class JsonbConditionWrapper {
+            +wrap(fieldName: String, condition: String): String
+            +wrap(fieldName: String, placeholder: String, condition: String): String
+            +wrap(vararg bundles: Pair<Pair<String, String>, String>): String
+            +wrap(param: List<IQueryParam>, condition: String): String
+        }
+
+        JsonbConditionWrapper ..|> IConditionWrapper
+    }
+
+    package filter {
+        interface IQueryFilter {
+            +filter(): String
+            +params(): List<IQueryParam>
+        }
+        together {
+
+        class NativeQueryFilter {
+            -sqlFilter: String
+            -bindMap: Map<String, Any>
+            -listOfParams: List<IQueryParam>
+            +filter(): String
+            +params(): List<IQueryParam>
+        }
+
+        NativeQueryFilter ..|> IQueryFilter
+        frame embedded {
+            class ProjectIdQueryFilter {
+                -projectId: String
+                -wrapper: IConditionWrapper
+                -condition: String
+                -params: List<IQueryParam>
+                -filter: String
+                +filter(): String
+                +params(): List<IQueryParam>
+            }
+
+            class UserIdQueryFilter {
+                -userId: String
+                -wrapper: IConditionWrapper
+                -condition: String
+                -params: List<IQueryParam>
+                -filter: String
+                +filter(): String
+                +params(): List<IQueryParam>
+            }
+        }
+        embedded ..|> IQueryFilter
+        }
+    }
+
+    package param {
+        together {
+            interface IQueryParam {
+                +getValue(): Any
+                +getPlaceholder(): String
+            }
+
+            class SimpleQueryParam {
+                -value: Any
+                -placeholder: String
+                +getValue(): Any
+                +getPlaceholder(): String
+            }
+        }
+
+        SimpleQueryParam ..|> IQueryParam
+
+        package filler {
+            interface IQueryParamMapper<T, R> {
+                +fillByFilters(filters: List<IQueryFilter>, clientBinder: T): R
+                +fillByParams(params: List<IQueryParam>, clientBinder: T): R
+                +fillByPairs(vararg pairs: Pair<String, Any>, clientBinder: T): R
+            }
+            
+            class R2dbcQueryParamMapper {
+                -argsFactory: IArgumentsHandlerFactory
+                +fillByPairs(vararg pairs: Pair<String, Any>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                +fillByFilters(filters: List<IQueryFilter>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                +fillByParams(params: List<IQueryParam>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                -fill(clientBinder: DatabaseClient.GenericExecuteSpec, paramsSupplier: () -> List<IQueryParam>): Mono<DatabaseClient.GenericExecuteSpec>
+            }
+            R2dbcQueryParamMapper --> IQueryParam
+            R2dbcQueryParamMapper ..|> IQueryParamMapper
+        }
+    }
+
+    package resolver {
+        interface IQueryFiltersResolver<T> {
+            +resolve(model: T): List<IQueryFilter>
+        }
+
+        IQueryFiltersResolver --> IQueryFilter
+    }
+}
+
+IQueryBuilder --> IQueryFilter
+filter --> SimpleQueryParam
+filter --> condition
+@enduml

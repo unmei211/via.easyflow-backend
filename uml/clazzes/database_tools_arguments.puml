@@ -1,0 +1,84 @@
+@startuml
+left to right direction
+
+package arguments {
+    package factory {
+        interface IArgumentsHandlerFactory {
+            +getSimple(): SimpleArgumentsHandler
+            +getR2dbc(): R2dbcArgumentsHandler
+            +getSimpleAsync(): Mono<SimpleArgumentsHandler>
+            +getR2dbcAsync(): Mono<R2dbcArgumentsHandler>
+        }
+
+        class ArgumentsHandlerFactory {
+            -mapper: ReactiveJsonIO
+            -defaultValueResolver: ByDefaultValueResolver
+            -documentValueResolver: DocumentValueResolver
+            -resolverManager: ArgumentValueResolverMapping
+            +getSimple(): SimpleArgumentsHandler
+            +getSimpleAsync(): Mono<SimpleArgumentsHandler>
+            +getR2dbc(): R2dbcArgumentsHandler
+            +getR2dbcAsync(): Mono<R2dbcArgumentsHandler>
+        }
+        ArgumentsHandlerFactory ..|> IArgumentsHandlerFactory
+    }
+
+    package handler {
+        interface IArgumentsHandler {
+            +bind(vararg binds: Pair<String, Any>): Mono<IArgumentsHandler>
+            +bindAsync(bind: Mono<Pair<String, Any>>): Mono<IArgumentsHandler>
+            +getMap(): Map<String, Any>
+        }
+
+        class R2dbcArgumentsHandler {
+            -resolverManager: ArgumentValueResolverMapping
+            -map: MutableMap<String, Any>
+            +getMap(): Map<String, Any>
+            +bind(vararg binds: Pair<String, Any>): Mono<IArgumentsHandler>
+            +bindAsync(bind: Mono<Pair<String, Any>>): Mono<IArgumentsHandler>
+        }
+
+        R2dbcArgumentsHandler ..|> IArgumentsHandler
+    }
+
+    package resolver {
+        together {
+            interface IArgumentValueResolver {
+                +resolve(value: Any): Mono<Any>
+            }
+
+            frame impl as valueResolversImpl {
+                class ByDefaultValueResolver {
+                    +resolve(value: Any): Mono<Any>
+                }
+
+                class DocumentValueResolver {
+                    -mapper: ReactiveJsonIO
+                    +resolve(value: Any): Mono<Any>
+                }
+            }
+        }
+        valueResolversImpl ..|> IArgumentValueResolver
+
+        package mapping {
+            interface IArgumentValueResolverMapping {
+                +get(placeholder: String): IArgumentValueResolver
+            }
+
+            class ArgumentValueResolverMapping {
+                -resolversMapping: Map<String, IArgumentValueResolver>
+                -default: IArgumentValueResolver
+                +get(placeholder: String): IArgumentValueResolver
+            }
+
+            ArgumentValueResolverMapping ..|> IArgumentValueResolverMapping
+            ArgumentValueResolverMapping --> IArgumentValueResolver
+        }
+    }
+}
+
+ArgumentsHandlerFactory --> ArgumentValueResolverMapping
+ArgumentsHandlerFactory --> valueResolversImpl
+R2dbcArgumentsHandler --> ArgumentValueResolverMapping
+
+@enduml

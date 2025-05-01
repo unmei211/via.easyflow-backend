@@ -1,0 +1,205 @@
+@startuml
+left to right direction
+
+    package arguments {
+        package factory {
+            interface IArgumentsHandlerFactory {
+                +getSimple(): SimpleArgumentsHandler
+                +getR2dbc(): R2dbcArgumentsHandler
+                +getSimpleAsync(): Mono<SimpleArgumentsHandler>
+                +getR2dbcAsync(): Mono<R2dbcArgumentsHandler>
+            }
+            
+            class ArgumentsHandlerFactory {
+                -mapper: ReactiveJsonIO
+                -defaultValueResolver: ByDefaultValueResolver
+                -documentValueResolver: DocumentValueResolver
+                -resolverManager: ArgumentValueResolverMapping
+                +getSimple(): SimpleArgumentsHandler
+                +getSimpleAsync(): Mono<SimpleArgumentsHandler>
+                +getR2dbc(): R2dbcArgumentsHandler
+                +getR2dbcAsync(): Mono<R2dbcArgumentsHandler>
+            }
+            ArgumentsHandlerFactory .|> IArgumentsHandlerFactory
+        }
+
+        package handler {
+            interface IArgumentsHandler {
+                +bind(vararg binds: Pair<String, Any>): Mono<IArgumentsHandler>
+                +bindAsync(bind: Mono<Pair<String, Any>>): Mono<IArgumentsHandler>
+                +getMap(): Map<String, Any>
+            }
+
+            class R2dbcArgumentsHandler {
+                -resolverManager: ArgumentValueResolverMapping
+                -map: MutableMap<String, Any>
+                +getMap(): Map<String, Any>
+                +bind(vararg binds: Pair<String, Any>): Mono<IArgumentsHandler>
+                +bindAsync(bind: Mono<Pair<String, Any>>): Mono<IArgumentsHandler>
+            }
+
+            R2dbcArgumentsHandler .|> IArgumentsHandler
+        }
+
+        package resolver {
+            together {
+                interface IArgumentValueResolver {
+                    +resolve(value: Any): Mono<Any>
+                }
+
+                frame impl as valueResolversImpl {
+                    class ByDefaultValueResolver {
+                        +resolve(value: Any): Mono<Any>
+                    }
+
+                    class DocumentValueResolver {
+                        -mapper: ReactiveJsonIO
+                        +resolve(value: Any): Mono<Any>
+                    }
+                }
+            }
+            valueResolversImpl .|> IArgumentValueResolver
+
+            package mapping {
+                interface IArgumentValueResolverMapping {
+                    +get(placeholder: String): IArgumentValueResolver
+                }
+
+                class ArgumentValueResolverMapping {
+                    -resolversMapping: Map<String, IArgumentValueResolver>
+                    -default: IArgumentValueResolver
+                    +get(placeholder: String): IArgumentValueResolver
+                }
+
+                ArgumentValueResolverMapping .|> IArgumentValueResolverMapping
+                ArgumentValueResolverMapping -> IArgumentValueResolver
+            }
+        }
+    }
+
+    package query {
+        package builder {
+            interface IQueryBuilder {
+                +build(filters: List<IQueryFilter>): String
+                +merge(filters: List<IQueryFilter>, sql: String): String
+                +merge(filters: String, sql: String): String
+            }
+
+            class SimpleQueryBuilder {
+                +build(filters: List<IQueryFilter>): String
+                +merge(filters: List<IQueryFilter>, sql: String): String
+                +merge(filters: String, sql: String): String
+            }
+
+            SimpleQueryBuilder .|> IQueryBuilder
+        }
+
+        package condition {
+            interface IConditionWrapper {
+                +wrap(fieldName: String, placeholder: String, condition: String): String
+                +wrap(fieldName: String, condition: String): String
+                +wrap(vararg bundles: Pair<Pair<String, String>, String>): String
+                +wrap(param: List<IQueryParam>, condition: String): String
+            }
+
+            class JsonbConditionWrapper {
+                +wrap(fieldName: String, condition: String): String
+                +wrap(fieldName: String, placeholder: String, condition: String): String
+                +wrap(vararg bundles: Pair<Pair<String, String>, String>): String
+                +wrap(param: List<IQueryParam>, condition: String): String
+            }
+
+            JsonbConditionWrapper .|> IConditionWrapper
+        }
+
+        package filter {
+            interface IQueryFilter {
+                +filter(): String
+                +params(): List<IQueryParam>
+            }
+            together {
+
+            class NativeQueryFilter {
+                -sqlFilter: String
+                -bindMap: Map<String, Any>
+                -listOfParams: List<IQueryParam>
+                +filter(): String
+                +params(): List<IQueryParam>
+            }
+
+            NativeQueryFilter ..|> IQueryFilter
+            frame embedded {
+                class ProjectIdQueryFilter {
+                    -projectId: String
+                    -wrapper: IConditionWrapper
+                    -condition: String
+                    -params: List<IQueryParam>
+                    -filter: String
+                    +filter(): String
+                    +params(): List<IQueryParam>
+                }
+
+                class UserIdQueryFilter {
+                    -userId: String
+                    -wrapper: IConditionWrapper
+                    -condition: String
+                    -params: List<IQueryParam>
+                    -filter: String
+                    +filter(): String
+                    +params(): List<IQueryParam>
+                }
+            }
+            embedded .|> IQueryFilter
+            embedded -> IConditionWrapper
+            }
+        }
+
+        package param {
+            interface IQueryParam {
+                +getValue(): Any
+                +getPlaceholder(): String
+            }
+
+            class SimpleQueryParam {
+                -value: Any
+                -placeholder: String
+                +getValue(): Any
+                +getPlaceholder(): String
+            }
+
+            SimpleQueryParam .|> IQueryParam
+
+            package filler {
+                class R2dbcQueryParamMapper {
+                    -argsFactory: IArgumentsHandlerFactory
+                    +fillByPairs(vararg pairs: Pair<String, Any>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                    +fillByFilters(filters: List<IQueryFilter>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                    +fillByParams(params: List<IQueryParam>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
+                    -fill(clientBinder: DatabaseClient.GenericExecuteSpec, paramsSupplier: () -> List<IQueryParam>): Mono<DatabaseClient.GenericExecuteSpec>
+                }
+
+                R2dbcQueryParamMapper --> IArgumentsHandlerFactory
+                R2dbcQueryParamMapper --> IQueryParam
+                R2dbcQueryParamMapper --> IQueryFilter
+            }
+        }
+
+        package resolver {
+            interface IQueryFiltersResolver<T> {
+                +resolve(model: T): List<IQueryFilter>
+            }
+
+            IQueryFiltersResolver --> IQueryFilter
+        }
+    }
+
+ArgumentsHandlerFactory --> ArgumentValueResolverMapping
+
+ArgumentsHandlerFactory --> valueResolversImpl
+
+R2dbcArgumentsHandler -> ArgumentValueResolverMapping
+IQueryBuilder --> IQueryFilter
+
+filter -> SimpleQueryParam
+
+@enduml

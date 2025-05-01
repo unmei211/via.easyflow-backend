@@ -1,0 +1,139 @@
+@startuml
+left to right direction
+
+together {
+    interface IUserService {
+    }
+    interface ITaskService {}
+    interface IProjectService {}
+}
+
+frame Adapter {
+    class ProjectAdapter {
+    }
+    class TaskAdapter {
+    }
+    class UserAdapter {
+    }
+
+    ProjectAdapter ..|> IProjectService
+    TaskAdapter ..|> ITaskService
+    UserAdapter ..|> IUserService
+}
+
+together {
+    enum CaseScope {
+        USER
+        TASK
+        PROJECT
+    }
+
+    annotation Case {
+        + scope: String
+    }
+
+    CaseScope ..> Case
+}
+
+together {
+    interface UseCase<T,R> {
+        + invoke(input: T): R
+    }
+
+    interface TypedUseCase<T, R> {
+        + invoke(input: T): R
+        + getInputType(): KClass<T>
+    }
+
+    TypedUseCase --|> UseCase
+}
+
+frame UseCases {
+    class UserMustBeAvailableCase {
+        - userService: IUserService
+        +getInputType(): KClass<Input>
+        +invoke(input: Input): Mono<Unit>
+        Input: Data Class
+    }
+
+    class GetProjectMembersCase {
+        - projectService: IProjectService
+        +getInputType(): KClass<Input>
+        +invoke(input: Input): Flux<ProjectMember>
+        Input: Data Class
+    }
+
+    class AddTaskCase {
+        - taskService: ITaskService
+        +getInputType(): KClass<Input>
+        +invoke(input: Input): Mono<TaskModel>
+        Input: Data Class
+    }
+}
+note left of UseCases : Множество юзкейсов
+
+together {
+    interface CaseInvoker {
+        +<T : TypedUseCase<F, S>, F : Any, S : Any> invoke(input: F): S
+        +<F : Any, S : Any> get(input: F): TypedUseCase<F, S>?
+    }
+    note top of CaseInvoker
+    T — реализация TypedUseCase
+    F — входной тип UseCase
+    S — выходной тип UseCase
+    end note
+
+
+    class ProjectCaseInvoker {
+        - useCasesByInputType : Map<KClass<*>, TypedUseCase<*, *>>
+    }
+    CaseInvoker <|.. ProjectCaseInvoker
+    note left of ProjectCaseInvoker
+    Юзкейсы вычисляются автоматически
+    на основе аннотации @Case
+    end note
+
+    class TaskCaseInvoker
+    CaseInvoker <|.. TaskCaseInvoker
+    class UserCaseInvoker
+    CaseInvoker <|.. UserCaseInvoker
+}
+
+together {
+    interface IProjectInteractor
+    interface IUserInteractor
+    interface ITaskInteractor
+}
+
+frame Interactors as i {
+    class ProjectInteractor {
+        - projectInvoker: ProjectCaseInvoker
+    }
+    class UserInteractor {
+        - userInvoker: UserCaseInvoker
+    }
+    class TaskInteractor {
+        - taskInvoker: TaskCaseInvoker
+    }
+
+}
+
+i --> UserCaseInvoker
+i --> TaskCaseInvoker
+i --> ProjectCaseInvoker
+
+ProjectInteractor ..|> IProjectInteractor
+UserInteractor ..|> IUserInteractor
+TaskInteractor ..|> ITaskInteractor
+
+
+UseCases --> Adapter
+
+i --> UseCases
+
+UseCases ..|> TypedUseCase
+
+Case ---- UseCases
+Case -- CaseInvoker
+
+@enduml
