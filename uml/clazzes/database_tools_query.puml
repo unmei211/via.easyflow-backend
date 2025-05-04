@@ -77,6 +77,14 @@ package query {
         }
     }
 
+
+    package resolver {
+        interface IQueryFiltersResolver<T> {
+            +resolve(model: T): List<IQueryFilter>
+        }
+
+        IQueryFiltersResolver --> IQueryFilter
+    }
     package param {
         together {
             interface IQueryParam {
@@ -100,7 +108,7 @@ package query {
                 +fillByParams(params: List<IQueryParam>, clientBinder: T): R
                 +fillByPairs(vararg pairs: Pair<String, Any>, clientBinder: T): R
             }
-            
+
             class R2dbcQueryParamMapper {
                 -argsFactory: IArgumentsHandlerFactory
                 +fillByPairs(vararg pairs: Pair<String, Any>, clientBinder: DatabaseClient.GenericExecuteSpec): Mono<DatabaseClient.GenericExecuteSpec>
@@ -111,14 +119,6 @@ package query {
             R2dbcQueryParamMapper --> IQueryParam
             R2dbcQueryParamMapper ..|> IQueryParamMapper
         }
-    }
-
-    package resolver {
-        interface IQueryFiltersResolver<T> {
-            +resolve(model: T): List<IQueryFilter>
-        }
-
-        IQueryFiltersResolver --> IQueryFilter
     }
 }
 
