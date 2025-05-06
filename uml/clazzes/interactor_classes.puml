@@ -2,23 +2,27 @@
 left to right direction
 
 together {
-    interface IUserService {
-    }
-    interface ITaskService {}
-    interface IProjectService {}
-}
 
-frame Adapter {
-    class ProjectAdapter {
-    }
-    class TaskAdapter {
-    }
-    class UserAdapter {
+    together {
+        interface IUserService {
+        }
+        interface ITaskService {}
+        interface IProjectService {}
+        }
+
+        frame Adapter {
+        class ProjectAdapter {
+        }
+        class TaskAdapter {
+        }
+        class UserAdapter {
+        }
+
+        ProjectAdapter ..|> IProjectService
+        TaskAdapter ..|> ITaskService
+        UserAdapter ..|> IUserService
     }
 
-    ProjectAdapter ..|> IProjectService
-    TaskAdapter ..|> ITaskService
-    UserAdapter ..|> IUserService
 }
 
 together {
@@ -84,44 +88,42 @@ together {
     end note
 
 
+    frame Invokers {
     class ProjectCaseInvoker {
         - useCasesByInputType : Map<KClass<*>, TypedUseCase<*, *>>
     }
-    CaseInvoker <|.. ProjectCaseInvoker
+'    CaseInvoker <|.. ProjectCaseInvoker
     note left of ProjectCaseInvoker
     Юзкейсы вычисляются автоматически
     на основе аннотации @Case
     end note
 
     class TaskCaseInvoker
-    CaseInvoker <|.. TaskCaseInvoker
+'    CaseInvoker <|.. TaskCaseInvoker
     class UserCaseInvoker
-    CaseInvoker <|.. UserCaseInvoker
+'    CaseInvoker <|.. UserCaseInvoker
+    }
+    CaseInvoker <|.. Invokers
+
 }
 
 together {
-    interface IProjectInteractor
-    interface IUserInteractor
-    interface ITaskInteractor
+    frame Interactors as i {
+        class ProjectInteractor {
+            - projectInvoker: ProjectCaseInvoker
+        }
+        class UserInteractor {
+            - userInvoker: UserCaseInvoker
+        }
+        class TaskInteractor {
+            - taskInvoker: TaskCaseInvoker
+        }
+        interface IProjectInteractor
+        interface IUserInteractor
+        interface ITaskInteractor
+    }
 }
-
-frame Interactors as i {
-    class ProjectInteractor {
-        - projectInvoker: ProjectCaseInvoker
-    }
-    class UserInteractor {
-        - userInvoker: UserCaseInvoker
-    }
-    class TaskInteractor {
-        - taskInvoker: TaskCaseInvoker
-    }
-
-}
-
-i --> UserCaseInvoker
-i --> TaskCaseInvoker
-i --> ProjectCaseInvoker
-
+i --> Invokers
 ProjectInteractor ..|> IProjectInteractor
 UserInteractor ..|> IUserInteractor
 TaskInteractor ..|> ITaskInteractor
